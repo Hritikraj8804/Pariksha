@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Exam Portal</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .error-message {
+            color: red;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <section class="auth-container">
+            <h1>Create an Account</h1>
+            <form id="signup-form" action="/post" method="POST" onsubmit="return validatePassword()">
+                <label for="signup-id">ID:</label>
+                <input type="number" id="signup-id" name="id" required>
+
+                <label for="signup-username">Username:</label>
+                <input type="text" id="signup-username" name="username" minlength="3" required>
+
+                <label for="signup-name">name:</label>
+                <input type="text" id="signup-username" name="name" minlength="4" required>
+
+                <label for="signup-email">Email:</label>
+                <input type="text" id="signup-email" name="email">
+
+                <label for="signup-mobile-no">Mobile No.:</label>
+                <input type="number" id="signup-mobile-no" name="mobile" maxlength="10" minlength="10">
+
+                <label for="signup-password">Password:</label>
+                <input type="password" id="signup-password" name="password" required>
+
+                <label for="signup-confirm-password">Confirm Password:</label>
+                <input type="password" id="signup-confirm-password" name="confirm-password" required>
+                <div id="password-error" class="error-message"></div>
+
+                <label for="signup-roles">Role:</label>
+                <select id="signup-roles" name="roles">
+                    <option value="student" selected>Student</option>
+                    <option value="teacher">Teacher</option>
+                    <option value="admin">Admin</option>
+                </select>
+
+                <button type="submit">Sign Up</button>
+            </form>
+            <p class="auth-link">Already have an account? <a href="login.html">Log in</a></p>
+            <p class="auth-link"><a href="index.html">Back to Home</a></p>
+        </section>
+    </main>
+
+    <script>
+        function validatePassword() {
+            const password = document.getElementById('signup-password').value;
+            const confirmPassword = document.getElementById('signup-confirm-password').value;
+            const passwordError = document.getElementById('password-error');
+
+            if (password !== confirmPassword) {
+                passwordError.textContent = "Passwords do not match.";
+                return false; 
+            } else {
+                passwordError.textContent = ""; // Clear any previous error message
+                return true; 
+            }
+        }
+    </script>
+</body>
+</html>
