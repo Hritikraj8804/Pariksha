@@ -88,11 +88,11 @@ app.post('/check', async (req, res) => {
             if (passwordMatch) {
                 req.session.user = { _id: user._id, username: user.username, roles: user.roles };
                 if (req.session.user && req.session.user.roles.includes('admin')) {
-                    res.sendFile(path.join(__dirname, '/public/adminview.html'));
+                    res.redirect(`/admin/dashboard`);
                 } else if (req.session.user && req.session.user.roles.includes('teacher')) {
-                    res.sendFile(path.join(__dirname, '/public/teacherview.html'));
+                    res.redirect(`/teacher/dashboard`);
                 }  else if (req.session.user && req.session.user.roles.includes('student')) {
-                    res.sendFile(path.join(__dirname, '/public/studentview.html'));
+                    res.redirect(`/student/dashboard`);
                 }
                 else {
                     res.redirect('/login.html');
@@ -118,3 +118,29 @@ app.get('/logout', (req, res) => {
         }
     });
 });
+
+
+app.get('/student/dashboard', (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('student')) {
+        res.sendFile(path.join(__dirname, '/public/studentview.html'));
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/teacher/dashboard', (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('teacher')) {
+        res.sendFile(path.join(__dirname, '/public/teacherview.html'));
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/admin/dashboard', (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('admin')) {
+        res.sendFile(path.join(__dirname, '/public/adminview.html'));
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
