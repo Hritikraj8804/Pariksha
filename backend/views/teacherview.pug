@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+html
+  head
+    link(rel='stylesheet', href='/styles.css')
+    title Teacher Dashboard
+  body
+    h1 Welcome #{user.name} to the Teacher Area
+    p Your username is: #{user.username}
+    p Your roles are: #{user.roles.join(', ')}
+    a(href='/login.html') Logout
