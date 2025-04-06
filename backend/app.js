@@ -7,11 +7,11 @@ const path = require('path');
 const dev = require('dotenv').config(); 
 const app = express();
 
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '../frontend/public')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); 
 app.set('view engine', 'pug'); 
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, '../frontend/views'));
 
 app.use(session({
     secret: "meanstack", 
@@ -44,7 +44,7 @@ app.listen(process.env.PORT, () => {
 });
 
 app.get('/home', (req, res) => { 
-    res.sendFile(path.join(__dirname, 'public/home.html'));
+    res.sendFile(path.join(__dirname, '../frontend/public/home.html'));
 });
 
 app.post('/post', async (req, res) => {
@@ -54,7 +54,7 @@ app.post('/post', async (req, res) => {
         const userData = { _id: id, username: username, name: name, password: hashedPassword, email: email, mobile: mobile, roles: roles };
         const m = new csemodel(userData);
         await m.save();
-        res.sendFile(path.join(__dirname, '/public/login.html'));
+        res.sendFile(path.join(__dirname, '../frontend/public/login.html'));
     } catch (err) {
         if (err.username === 'ValidationError') {
             if (err.errors && err.errors.username && err.errors.username.kind === 'unique') {
