@@ -109,6 +109,7 @@ a:hover {
   --warning-color: #f72585;
   --text-color: #333;
   --text-light: #6c757d;
+  --white: white;
 }
 
 * {
@@ -222,6 +223,7 @@ a {
     top: 0;
     z-index: 1000;
     padding: 1rem 0;
+    border-radius: 0 0 20px 20px;
   }
   
   .nav-container {

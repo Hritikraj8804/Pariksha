@@ -1,10 +1,225 @@
 <!DOCTYPE html>
-html
+html(lang="en")
   head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Exam Portal - Student Dashboard
     link(rel='stylesheet', href='/styles.css')
-    title Student Dashboard
+    style.
+      
+      .dashboard-container {
+        max-width: 1000px;
+        margin: 80px auto; 
+        padding: 20px;
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .dashboard-header h1 {
+        font-size: 2rem;
+        color: var(--dark-color);
+      }
+
+      .user-info {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+      }
+
+      .user-avatar {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1.2rem;
+        font-weight: bold;
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .dashboard-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        transition: transform 0.3s ease;
+        border: 1px solid #eee;
+      }
+
+      .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-title {
+        font-size: 1.3rem;
+        color: var(--dark-color);
+        margin-bottom: 10px;
+      }
+
+      .card-content p {
+        color: var(--text-light);
+        margin-bottom: 15px;
+      }
+
+      .card-actions a {
+        display: inline-block;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .card-actions a:hover {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .upcoming-tests-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .upcoming-tests-list li {
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .upcoming-tests-list li:last-child {
+        border-bottom: none;
+      }
+
+      .upcoming-tests-list li strong {
+        color: var(--dark-color);
+      }
   body
-    h1 Welcome #{user.name} to the Student Area
-    p Your username is: #{user.username}
-    p Your roles are: #{user.roles.join(', ')}
-    a(href='/login.html') Logout
+    nav.navbar
+      .nav-container
+        a.logo(href="/") ExamPortal
+
+        .menu-toggle#mobile-menu
+          span
+          span
+          span
+
+        .nav-links#nav-links
+          a(href="") Dashboard
+          a(href="") My Tests
+          a(href="") Results
+          .auth-links
+            .user-info
+              .user-avatar#user-initials
+              span#user-name #{user.name}
+            a.btn.btn-outline(href="/logout") Logout
+
+    .dashboard-container
+      .dashboard-header
+        h1 #{user.name}, Dashboard
+
+      .dashboard-grid
+        .dashboard-card
+          h2.card-title Upcoming Exams
+          .card-content
+            ul.upcoming-tests-list#upcoming-exams
+              li
+                strong Mathematics
+                |  - May 10, 2024
+              li
+                strong Science
+                |  - May 15, 2024
+              li
+                strong English
+                |  - May 20, 2024
+            p.card-actions
+              a(href="") View All Upcoming Exams
+
+        .dashboard-card
+          h2.card-title Recent Results
+          .card-content
+            ul.upcoming-tests-list#recent-results
+              li
+                strong Mathematics
+                |  - Score: 85%
+              li
+                strong Science
+                |  - Score: 78%
+            p.card-actions
+              a(href="") View All Results
+
+        .dashboard-card
+          h2.card-title Practice Tests
+          .card-content
+            p Prepare for your exams with practice tests.
+            p.card-actions
+              a(href="") Start a Practice Test
+
+        .dashboard-card
+          h2.card-title Profile Information
+          .card-content
+            p View and update your profile details.
+            p.card-actions
+              a(href="") Edit Profile
+
+    footer.footer
+      .container
+        .footer-grid
+          .footer-col
+            h3 ExamPortal
+            p Empowering educators and students through technology
+          .footer-col
+            h4 Quick Links
+            ul
+              li
+                a(href="/") Dashboard
+              li
+                a(href="") My Tests
+              li
+                a(href="") Results
+          .footer-col
+            h4 Legal
+            ul
+              li
+                a(href="") Privacy Policy
+              li
+                a(href="") Terms of Service
+        .copyright
+          p &copy; 2025 ExamPortal. All rights reserved.
+
+    script.
+      document.getElementById('mobile-menu').addEventListener('click', function() {
+        this.classList.toggle('active');
+        document.getElementById('nav-links').classList.toggle('active');
+      });
+
+      // Example JavaScript to display user initials
+      document.addEventListener('DOMContentLoaded', function() {
+        const userNamePlaceholder = document.getElementById('user-name');
+        const dashboardUserNamePlaceholder = document.getElementById('dashboard-user-name');
+        const userInitialsPlaceholder = document.getElementById('user-initials');
+        const dashboardUserInitialsPlaceholder = document.getElementById('dashboard-user-initials');
+
+        const userName = userNamePlaceholder.textContent.trim();
+
+        if (userName) {
+          const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
+          userInitialsPlaceholder.textContent = initials;
+          dashboardUserInitialsPlaceholder.textContent = initials;
+        }
+      });
