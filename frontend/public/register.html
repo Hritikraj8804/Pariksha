@@ -4,12 +4,75 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Exam Portal</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="/styles.css">
     <style>
         .error-message {
-            color: red;
+            color: #dc3545; /* Bootstrap's error color */
             margin-top: 5px;
             font-size: 0.9em;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #495057; /* Darker label color */
+            font-weight: bold; /* Make labels stand out */
+        }
+        .form-control {
+            width: 100%;
+            padding: 12px; /* Increased padding */
+            margin-bottom: 10px;
+            border: 1px solid #ced4da; /* Bootstrap's border color */
+            border-radius: 6px; /* Slightly more rounded inputs */
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        .form-control:focus {
+            border-color: #007bff; /* Highlight on focus */
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Focus shadow */
+            outline: none;
+        }
+        .form-control-file {
+            padding: 8px 0; /* Adjust padding for file input */
+        }
+        .btn {
+            display: inline-block;
+            font-weight: 400;
+            color: #fff;
+            text-align: center;
+            vertical-align: middle;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            background-color: #007bff;
+            border: 1px solid #007bff;
+            padding: 12px 20px;
+            font-size: 1rem;
+            line-height: 1.5;
+            border-radius: 6px;
+            transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            cursor: pointer;
+            width: 100%;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+        .auth-link {
+            margin-top: 20px;
+            text-align: center;
+            color: #6c757d; /* Muted link color */
+            font-size: 0.9rem;
+        }
+        .auth-link a {
+            color: #007bff;
+            text-decoration: none;
+        }
+        .auth-link a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -17,38 +80,48 @@
     <main>
         <section class="auth-container">
             <h1>Create an Account</h1>
-            <form id="signup-form" action="/post" method="POST"  enctype="multipart/form-data" onsubmit="return validatePassword()">
-                <label for="signup-id">ID:</label>
-                <input type="number" id="signup-id" name="id" required>
-
-                <label for="signup-username">Username:</label>
-                <input type="text" id="signup-username" name="username" minlength="3" required>
-
-                <label for="signup-name">name:</label>
-                <input type="text" id="signup-username" name="name" minlength="4" required>
-
-                <label for="signup-email">Email:</label>
-                <input type="text" id="signup-email" name="email">
-
-                <label for="signup-mobile-no">Mobile No.:</label>
-                <input type="number" id="signup-mobile-no" name="mobile" maxlength="10" minlength="10">
-
-                <label for="signup-password">Password:</label>
-                <input type="password" id="signup-password" name="password" required>
-
-                <label for="signup-confirm-password">Confirm Password:</label>
-                <input type="password" id="signup-confirm-password" name="confirm-password" required>
-                <div id="password-error" class="error-message"></div>
-
-                <label for="signup-roles">Role:</label>
-                <select id="signup-roles" name="roles">
-                    <option value="student" selected>Student</option>
-                    <option value="teacher">Teacher</option>
-                </select>
-
-                <input type="file" name="file" >
-
-                <button type="submit">Sign Up</button>
+            <form id="signup-form" action="/post" method="POST" enctype="multipart/form-data" onsubmit="return validatePassword()">
+                <div class="form-group">
+                    <label for="signup-id">ID:</label>
+                    <input type="number" id="signup-id" name="id" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-username">Username:</label>
+                    <input type="text" id="signup-username" name="username" class="form-control" minlength="3" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-name">Name:</label>
+                    <input type="text" id="signup-name" name="name" class="form-control" minlength="4" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-email">Email:</label>
+                    <input type="email" id="signup-email" name="email" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="signup-mobile-no">Mobile No.:</label>
+                    <input type="number" id="signup-mobile-no" name="mobile" class="form-control" maxlength="10" minlength="10">
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">Password:</label>
+                    <input type="password" id="signup-password" name="password" class="form-control" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm-password">Confirm Password:</label>
+                    <input type="password" id="signup-confirm-password" name="confirm-password" class="form-control" required>
+                    <div id="password-error" class="error-message"></div>
+                </div>
+                <div class="form-group">
+                    <label for="signup-roles">Role:</label>
+                    <select id="signup-roles" name="roles" class="form-control">
+                        <option value="student" selected>Student</option>
+                        <option value="teacher">Teacher</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="signup-file">Profile Picture (Optional):</label>
+                    <input type="file" id="signup-file" name="file" class="form-control-file">
+                </div>
+                <button type="submit" class="btn btn-primary">Sign Up</button>
             </form>
             <p class="auth-link">Already have an account? <a href="login.html">Log in</a></p>
             <p class="auth-link"><a href="home.html">Back to Home</a></p>
@@ -63,10 +136,10 @@
 
             if (password !== confirmPassword) {
                 passwordError.textContent = "Passwords do not match.";
-                return false; 
+                return false;
             } else {
                 passwordError.textContent = ""; // Clear any previous error message
-                return true; 
+                return true;
             }
         }
     </script>
