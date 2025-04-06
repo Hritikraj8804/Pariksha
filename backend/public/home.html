@@ -3,30 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exam Portal</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Exam Portal - Home</title>
+    <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-    <header>
-        <h1>Welcome to the Exam Portal</h1>
-        <p>Prepare, Practice, and Ace Your Exams!</p>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+          <a href="/" class="logo">ExamPortal</a>
+          
+          <div class="menu-toggle" id="mobile-menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+          
+          <div class="nav-links" id="nav-links">
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
+            <div class="auth-links">
+              <a href="./login.html" class="btn btn-outline">Login</a>
+              <a href="./register.html" class="btn btn-primary">Register</a>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+    <!-- Hero Section -->
+    <header class="hero">
+        <div class="container">
+            <h1>Your Gateway to Seamless Examinations</h1>
+            <p>Practice, Assess, and Excel with our comprehensive testing platform</p>
+            <div class="cta-buttons">
+                <a href="/auth/register" class="btn btn-primary">
+                  <span class="btn-text">Get Started</span>
+                  <span class="btn-icon">→</span>
+                </a>
+                <a href="#features" class="btn btn-outline">
+                  <span class="btn-text">Learn More</span>
+                </a>
+              </div>
+        </div>
     </header>
 
-    <main>
-        <section id="auth-buttons">
-            <p>Already have an account?</p>
-            <a href="/login.html">Login</a>
-            <p>New to the platform?</p>
-            <a href="./register.html">Sign Up</a>
-        </section>
+    <!-- Features Section -->
+    <section id="features" class="features">
+        <div class="container">
+            <h2>Key Features</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">⏱️</div>
+                    <h3>Timed Exams</h3>
+                    <p>Real-time countdown with auto-submission</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Instant Results</h3>
+                    <p>Detailed score breakdowns with analytics</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Retake Tests</h3>
+                    <p>Multiple attempts with question randomization</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-        
-    </main>
+    <!-- Testimonials -->
+    <section class="testimonials">
+        <div class="container">
+            <h2>Trusted by Educators Worldwide</h2>
+            <div class="testimonial-slider">
+                <!-- Testimonial cards would go here -->
+            </div>
+        </div>
+    </section>
 
-    <footer>
-        <p>&copy; 2025 Exam Portal</p>
+    <!-- Upcoming Tests (Dynamic Section) -->
+    <section class="upcoming-tests">
+        <div class="container">
+            <h2>Upcoming Tests</h2>
+            <div class="test-grid" id="testContainer">
+                <!-- Tests loaded via JavaScript -->
+                <div class="test-card">
+                    <h3>Mathematics Midterm</h3>
+                    <p>Starts: May 15, 2024</p>
+                    <p>Duration: 90 minutes</p>
+                    <a href="/tests/math-midterm" class="btn btn-small">View Details</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-col">
+                    <h3>ExamPortal</h3>
+                    <p>Empowering educators and students through technology</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/about">About Us</a></li>
+                        <li><a href="/contact">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="/privacy">Privacy Policy</a></li>
+                        <li><a href="/terms">Terms of Service</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 ExamPortal. All rights reserved.</p>
+            </div>
+        </div>
     </footer>
+    <script>
+        document.getElementById('mobile-menu').addEventListener('click', function() {
+        this.classList.toggle('active');
+        document.getElementById('nav-links').classList.toggle('active');
+        });
+    </script>
 
-    
 </body>
 </html>
+
