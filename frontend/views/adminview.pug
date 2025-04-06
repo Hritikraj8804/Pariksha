@@ -44,6 +44,13 @@ html(lang="en")
         align-items: center;
         font-size: 1.2rem;
         font-weight: bold;
+        overflow: hidden; /* To contain the image within the circle */
+      }
+
+      .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensure the image fills the circle without distortion */
       }
 
       .dashboard-grid {
@@ -131,15 +138,17 @@ html(lang="en")
           .auth-links
             .user-info
               .user-avatar#user-initials
+                if profileImage
+                  img(src=profileImage, alt="Profile Image")
+                else
+                  span#user-initials-text
               span#user-name #{user.name}
-            a.btn.btn-outline(href="/logout") Logout
+            a.btn.btn-outline(href="/login.html") Logout
+
 
     .dashboard-container
       .dashboard-header
-        h1 Administrator Dashboard
-        .user-info
-          .user-avatar#dashboard-user-initials
-          span#dashboard-user-name #{user.name}
+        h1 #{user.name} Dashboard
 
       .dashboard-grid
         .dashboard-card
@@ -214,14 +223,34 @@ html(lang="en")
       document.addEventListener('DOMContentLoaded', function() {
         const userNamePlaceholder = document.getElementById('user-name');
         const dashboardUserNamePlaceholder = document.getElementById('dashboard-user-name');
-        const userInitialsPlaceholder = document.getElementById('user-initials');
-        const dashboardUserInitialsPlaceholder = document.getElementById('dashboard-user-initials');
-
+        const userAvatar = document.getElementById('user-initials'); // Get the parent div
+        const dashboardUserAvatar = document.getElementById('dashboard-user-initials'); // Get the parent div
         const userName = userNamePlaceholder.textContent.trim();
 
         if (userName) {
           const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
-          userInitialsPlaceholder.textContent = initials;
-          dashboardUserInitialsPlaceholder.textContent = initials;
+          // For the navigation bar
+          const userInitialsText = userAvatar.querySelector('#user-initials-text');
+          const userImage = userAvatar.querySelector('img');
+          if (userInitialsText) userInitialsText.textContent = initials;
+          if (profileImage) {
+            if (userInitialsText) userInitialsText.style.display = 'none';
+            if (userImage) userImage.style.display = 'block';
+          } else {
+            if (userInitialsText) userInitialsText.style.display = 'flex';
+            if (userImage) userImage.style.display = 'none';
+          }
+
+          // For the dashboard header
+          const dashboardUserInitialsText = dashboardUserAvatar.querySelector('#dashboard-user-initials-text');
+          const dashboardUserImage = dashboardUserAvatar.querySelector('img');
+          if (dashboardUserInitialsText) dashboardUserInitialsText.textContent = initials;
+          if (profileImage) {
+            if (dashboardUserInitialsText) dashboardUserInitialsText.style.display = 'none';
+            if (dashboardUserImage) dashboardUserImage.style.display = 'block';
+          } else {
+            if (dashboardUserInitialsText) dashboardUserInitialsText.style.display = 'flex';
+            if (dashboardUserImage) dashboardUserImage.style.display = 'none';
+          }
         }
       });

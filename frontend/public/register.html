@@ -17,7 +17,7 @@
     <main>
         <section class="auth-container">
             <h1>Create an Account</h1>
-            <form id="signup-form" action="/post" method="POST" onsubmit="return validatePassword()">
+            <form id="signup-form" action="/post" method="POST"  enctype="multipart/form-data" onsubmit="return validatePassword()">
                 <label for="signup-id">ID:</label>
                 <input type="number" id="signup-id" name="id" required>
 
@@ -45,6 +45,8 @@
                     <option value="student" selected>Student</option>
                     <option value="teacher">Teacher</option>
                 </select>
+
+                <input type="file" name="file" >
 
                 <button type="submit">Sign Up</button>
             </form>

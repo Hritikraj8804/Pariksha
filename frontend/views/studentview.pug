@@ -6,10 +6,10 @@ html(lang="en")
     title Exam Portal - Student Dashboard
     link(rel='stylesheet', href='/styles.css')
     style.
-      
+      /* Specific styles for the student dashboard */
       .dashboard-container {
         max-width: 1000px;
-        margin: 80px auto; 
+        margin: 80px auto;
         padding: 20px;
       }
 
@@ -44,6 +44,13 @@ html(lang="en")
         align-items: center;
         font-size: 1.2rem;
         font-weight: bold;
+        overflow: hidden; /* To contain the image within the circle */
+      }
+
+      .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ensure the image fills the circle without distortion */
       }
 
       .dashboard-grid {
@@ -126,8 +133,12 @@ html(lang="en")
           .auth-links
             .user-info
               .user-avatar#user-initials
+                if profileImage
+                  img(src=profileImage, alt="Profile Image")
+                else
+                  span#user-initials-text
               span#user-name #{user.name}
-            a.btn.btn-outline(href="/logout") Logout
+            a.btn.btn-outline(href="/login.html") Logout
 
     .dashboard-container
       .dashboard-header
@@ -208,18 +219,22 @@ html(lang="en")
         document.getElementById('nav-links').classList.toggle('active');
       });
 
-      // Example JavaScript to display user initials
       document.addEventListener('DOMContentLoaded', function() {
         const userNamePlaceholder = document.getElementById('user-name');
         const dashboardUserNamePlaceholder = document.getElementById('dashboard-user-name');
         const userInitialsPlaceholder = document.getElementById('user-initials');
         const dashboardUserInitialsPlaceholder = document.getElementById('dashboard-user-initials');
+        const userInitialsText = document.getElementById('user-initials-text');
+        const dashboardUserInitialsText = document.getElementById('dashboard-user-initials-text');
 
         const userName = userNamePlaceholder.textContent.trim();
 
         if (userName) {
           const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
-          userInitialsPlaceholder.textContent = initials;
-          dashboardUserInitialsPlaceholder.textContent = initials;
+          if (userInitialsText) userInitialsText.textContent = initials;
+          if (dashboardUserInitialsText) dashboardUserInitialsText.textContent = initials;
         }
       });
+
+      // In a real application, you would fetch upcoming exams and recent results
+      // from your backend API and dynamically populate the lists.
