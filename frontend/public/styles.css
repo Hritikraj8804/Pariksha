@@ -66,7 +66,7 @@ a {
   /* Outline Button (for secondary actions) */
   .btn-outline {
     background-color: transparent;
-    color: var(--primary-color);
+    color: var(--white);
     border-color: var(--primary-color);
     padding: 8px 16px; /* Reduced padding */
     font-size: 0.9rem; /* Reduced font size */
@@ -143,7 +143,6 @@ a {
 
 .nav-links a {
   font-weight: 500;
-  color: var(--dark-color);
   transition: color 0.3s ease;
   font-size: 0.9rem; /* Reduced font size */
 }
