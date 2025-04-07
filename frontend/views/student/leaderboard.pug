@@ -1,0 +1,99 @@
+extends layout
+
+block content
+  style.
+    /* Specific styles for the leaderboard */
+    .leaderboard-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      border: 1px solid #eee;
+    }
+
+    .leaderboard-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--primary-color);
+    }
+
+    .leaderboard-header h1 {
+      color: var(--dark-color);
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .leaderboard-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .leaderboard-table th,
+    .leaderboard-table td {
+      padding: 12px 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .leaderboard-table th {
+      background-color: var(--light-gray);
+      color: var(--dark-color);
+      font-weight: bold;
+    }
+
+    .leaderboard-table tbody tr:nth-child(even) {
+      background-color: #f9f9f9;
+    }
+
+    .leaderboard-table tbody tr:hover {
+      background-color: #f0f0f0;
+    }
+
+    .leaderboard-table td:first-child {
+      font-weight: bold;
+      color: var(--primary-color);
+    }
+
+    .no-data {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-light);
+    }
+
+    /* Optional: Add some visual enhancements for top ranks */
+    .leaderboard-table tbody tr:first-child td {
+      color: gold;
+    }
+
+    .leaderboard-table tbody tr:nth-child(2) td {
+      color: silver;
+    }
+
+    .leaderboard-table tbody tr:nth-child(3) td {
+      color: #cd7f32; /* Bronze color */
+    }
+
+  .leaderboard-container
+    .leaderboard-header
+      h1 Leaderboard for #{user.name}
+
+    table.leaderboard-table
+      thead
+        tr
+          th Rank
+          th Name
+          th Score
+      tbody#leaderboard-body
+        if leaderboard && leaderboard.length > 0
+          each entry, index in leaderboard
+            tr
+              td #{index + 1}
+              td #{entry.name}
+              td #{entry.score}%
+        else
+          tr.no-data
+            td(colspan="3") No leaderboard data available.

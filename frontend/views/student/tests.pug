@@ -1,0 +1,78 @@
+extends layout
+
+block content
+  style.
+    /* Styles for the Tests page */
+    .tests-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      border: 1px solid #eee;
+    }
+
+    .tests-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--primary-color);
+    }
+
+    .tests-header h1 {
+      color: var(--dark-color);
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .tests-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .tests-list li {
+      background-color: #f9f9f9;
+      border: 1px solid #eee;
+      border-radius: 5px;
+      margin-bottom: 10px;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: transform 0.3s ease;
+    }
+
+    .tests-list li:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    .tests-list li a {
+      text-decoration: none;
+      color: var(--dark-color);
+      font-weight: bold;
+    }
+
+    .tests-list li span {
+      color: var(--text-light);
+      font-size: 0.9rem;
+    }
+
+    .no-tests {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-light);
+    }
+  .tests-container
+    .tests-header
+      h1 Available Tests for #{user.name}
+
+    if tests && tests.length > 0
+      ul.tests-list
+        each test in tests
+          li
+            a(href=test.link) #{test.name}
+            span (#{test.questionsCount} Questions)
+    else
+      p.no-tests No tests available at the moment.

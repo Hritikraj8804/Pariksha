@@ -1,0 +1,117 @@
+extends layout
+
+block content
+  style.
+    /* Styles for the My Performance page */
+    .performance-container {
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      border: 1px solid #eee;
+    }
+
+    .performance-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 2px solid var(--primary-color);
+    }
+
+    .performance-header h1 {
+      color: var(--dark-color);
+      font-size: 2rem;
+      margin-bottom: 10px;
+    }
+
+    .performance-overview {
+      background-color: #f9f9f9;
+      border: 1px solid #eee;
+      border-radius: 5px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .performance-overview h3 {
+      color: var(--dark-color);
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+
+    .performance-details h3,
+    .performance-history h3 {
+      color: var(--dark-color);
+      margin-top: 20px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+
+    .performance-details ul,
+    .performance-history ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .performance-details li,
+    .performance-history li {
+      padding: 10px 0;
+      border-bottom: 1px solid #eee;
+    }
+
+    .performance-details li:last-child,
+    .performance-history li:last-child {
+      border-bottom: none;
+    }
+
+    .performance-details li strong,
+    .performance-history li strong {
+      color: var(--dark-color);
+      font-weight: bold;
+    }
+
+    .performance-details li span,
+    .performance-history li span {
+      color: var(--text-light);
+      margin-left: 10px;
+    }
+
+    .no-performance-data {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-light);
+    }
+  .performance-container
+    .performance-header
+      h1 My Performance, #{user.name}
+
+    .performance-overview
+      h3 Overall Progress
+      if performance && performance.overallCompletionRate !== undefined
+        p Your overall completion rate: #[strong #{performance.overallCompletionRate}%]
+      else
+        p No overall progress data available.
+
+    .performance-details
+      h3 Subject-wise Performance
+      if performance && performance.subjects && performance.subjects.length > 0
+        ul
+          each subject in performance.subjects
+            li
+              strong #{subject.name}:
+              span Score: #{subject.score !== undefined ? subject.score + '%' : 'N/A'}
+      else
+        p.no-performance-data No subject-wise performance data available yet.
+
+    .performance-history
+      h3 Recent Test Scores
+      if performance && performance.testHistory && performance.testHistory.length > 0
+        ul
+          each test in performance.testHistory
+            li
+              strong #{test.name}:
+              span Score: #{test.score !== undefined ? test.score + '%' : 'N/A'}, Taken on: #{test.date}
+      else
+        p.no-performance-data No recent test history available.
