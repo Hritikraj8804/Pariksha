@@ -3,15 +3,105 @@
 <head>
     <link rel="stylesheet" href="/styles.css">
     <title>Login</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            background-color: #f8f9fa;
+        }
+
+        h1 {
+            color: #343a40;
+            margin-bottom: 20px; /* Slightly reduced */
+            text-align: center;
+        }
+
+        form {
+            background-color: #fff;
+            padding: 25px; /* Slightly reduced */
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 15px; /* Reduced gap between form groups */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px; /* Reduced gap between label and input */
+            color: #495057;
+            font-weight: bold;
+            font-size: 0.95rem; /* Slightly smaller label */
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px; /* Reduced padding slightly */
+            margin-bottom: 15px; /* Reduced gap below input */
+            border: 1px solid #ced4da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            outline: none;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 18px; /* Reduced padding slightly */
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            transition: background-color 0.15s ease-in-out;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            display: block;
+            margin-top: 15px; /* Reduced gap above register link */
+            color: #007bff;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <h1>Login</h1>
     <form action="/check" method="post">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username"><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password"><br><br>
-        <input type="submit" value="Login">
+        <div class="form-group">
+            <label for="username">Username:</label><br>
+            <input type="text" id="username" name="username" class="form-control"><br>
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label><br>
+            <input type="password" id="password" name="password" class="form-control"><br>
+        </div>
+        <input type="submit" value="Login" class="btn btn-primary">
     </form>
     <a href="./register.html">Register</a>
 </body>
