@@ -1,0 +1,87 @@
+extends layout
+
+block content
+  .dashboard-container
+    .dashboard-header
+      h1 #{user.name}, Dashboard
+
+    .dashboard-grid
+      .dashboard-card
+        h2.card-title Upcoming Exams
+        .card-content
+          ul.upcoming-tests-list#upcoming-exams
+            if upcomingExams && upcomingExams.length > 0
+              each exam in upcomingExams
+                li
+                  strong #{exam.name}
+                  | &nbsp;- #{new Date(exam.date).toLocaleDateString()}
+            else
+              li No upcoming exams scheduled.
+          p.card-actions
+            a(href="/student/tests") View All Upcoming Exams
+
+      .dashboard-card
+        h2.card-title Recent Results
+        .card-content
+          ul.upcoming-tests-list#recent-results
+            if recentResults && recentResults.length > 0
+              each result in recentResults
+                li
+                  strong #{result.testName}
+                  | &nbsp;- Score: #{result.score}%
+            else
+              li No recent results available.
+          p.card-actions
+            a(href="/student/performance") View All Results
+
+      .dashboard-card
+        h2.card-title Practice Tests
+        .card-content
+          p Prepare for your exams with practice tests.
+          p.card-actions
+            a(href="") Start a Practice Test
+
+      .dashboard-card
+        h2.card-title Profile Information
+        .card-content
+          p View and update your profile details.
+          p.card-actions
+            a(href="") Edit Profile
+
+  script.
+    // In a real application, you would fetch upcoming exams and recent results
+    // from your backend API and dynamically populate the lists.
+    // Example of how you might fetch data (replace with your actual API calls):
+    // fetch('/api/student/upcoming-exams')
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     const upcomingExamsList = document.getElementById('upcoming-exams');
+    //     if (data && data.length > 0) {
+    //       data.forEach(exam => {
+    //         const li = document.createElement('li');
+    //         li.innerHTML = `<strong>${exam.name}</strong> &nbsp;- ${new Date(exam.date).toLocaleDateString()}`;
+    //         upcomingExamsList.appendChild(li);
+    //       });
+    //     } else {
+    //       const li = document.createElement('li');
+    //       li.textContent = 'No upcoming exams scheduled.';
+    //       upcomingExamsList.appendChild(li);
+    //     }
+    //   });
+
+    // fetch('/api/student/recent-results')
+    //   .then(response => response.json())
+    //   .then(data => {
+    //     const recentResultsList = document.getElementById('recent-results');
+    //     if (data && data.length > 0) {
+    //       data.forEach(result => {
+    //         const li = document.createElement('li');
+    //         li.innerHTML = `<strong>${result.testName}</strong> &nbsp;- Score: ${result.score}%`;
+    //         recentResultsList.appendChild(li);
+    //       });
+    //     } else {
+    //       const li = document.createElement('li');
+    //       li.textContent = 'No recent results available.';
+    //       recentResultsList.appendChild(li);
+    //     }
+    //   });

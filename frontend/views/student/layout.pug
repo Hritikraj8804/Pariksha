@@ -1,0 +1,372 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Exam Portal - Student Dashboard
+    link(rel='stylesheet', href='/styles.css')
+    style.
+      /* Specific styles for the student dashboard with sidebar */
+      body {
+        display: flex;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--text-color);
+        background-color: var(--light-color);
+        overflow-x: hidden; /* Prevent horizontal scroll due to sidebar */
+      }
+
+      .sidebar {
+        background-color: var(--white);
+        width: 250px;
+        height: 100vh;
+        position: fixed;
+        left: -250px; /* Initially hidden */
+        top: 0;
+        box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        transition: left 0.3s ease-in-out;
+        z-index: 100;
+      }
+
+      .sidebar.open {
+        left: 0;
+      }
+
+      .sidebar-header {
+        display: flex;
+        justify-content: flex-end;
+        margin-bottom: 20px;
+      }
+
+      .close-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--text-light);
+      }
+
+      .sidebar-menu {
+        list-style: none;
+        padding: 0;
+      }
+
+      .sidebar-menu li {
+        margin-bottom: 15px;
+      }
+
+      .sidebar-menu li a {
+        display: block;
+        padding: 10px 15px;
+        text-decoration: none;
+        color: var(--dark-color);
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+      }
+
+      .sidebar-menu li a:hover {
+        background-color: var(--primary-color);
+      }
+
+      .content {
+        flex-grow: 1;
+        margin-left: 0; /* Adjusted by JavaScript when sidebar is open */
+        transition: margin-left 0.3s ease-in-out;
+      }
+
+      .content.open {
+        margin-left: 250px;
+      }
+
+      .dashboard-container {
+        max-width: 1000px;
+        margin: 20px auto; /* Adjusted margin */
+        padding: 20px;
+      }
+
+      .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #eee;
+      }
+
+      .dashboard-header h1 {
+        font-size: 2rem;
+        color: var(--dark-color);
+      }
+
+      .user-dropdown {
+        position: relative;
+        display: inline-block;
+      }
+
+      .user-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background-color: var(--primary-color);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 1rem;
+        font-weight: bold;
+        overflow: hidden;
+        cursor: pointer;
+      }
+
+      .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: var(--white);
+        min-width: 120px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+        right: 0;
+        border-radius: 5px;
+        margin-top: 5px;
+      }
+
+      .dropdown-content.show {
+        display: block;
+      }
+
+      .dropdown-content a {
+        color: var(--dark-color);
+        padding: 10px 15px;
+        text-decoration: none;
+        display: block;
+        transition: background-color 0.3s ease;
+        font-size: 0.9rem;
+        text-align: left;
+        border-radius: 5px;
+      }
+
+      .dropdown-content a:hover {
+        background-color: var(--primary-color);
+      }
+
+      .dashboard-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 20px;
+      }
+
+      .dashboard-card {
+        background-color: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        transition: transform 0.3s ease;
+        border: 1px solid #eee;
+      }
+
+      .dashboard-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+      }
+
+      .card-title {
+        font-size: 1.3rem;
+        color: var(--dark-color);
+        margin-bottom: 10px;
+      }
+
+      .card-content p {
+        color: var(--text-light);
+        margin-bottom: 15px;
+      }
+
+      .card-actions a {
+        display: inline-block;
+        padding: 8px 15px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: var(--primary-color);
+        border: 1px solid var(--primary-color);
+        transition: background-color 0.3s ease, color 0.3s ease;
+      }
+
+      .card-actions a:hover {
+        background-color: var(--primary-color);
+        color: white;
+      }
+
+      .upcoming-tests-list {
+        list-style: none;
+        padding: 0;
+      }
+
+      .upcoming-tests-list li {
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+      }
+
+      .upcoming-tests-list li:last-child {
+        border-bottom: none;
+      }
+
+      .upcoming-tests-list li strong {
+        color: var(--dark-color);
+      }
+
+      .header {
+        background-color: var(--white);
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 99;
+        padding: 1rem 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .header-left {
+        display: flex;
+        align-items: center;
+      }
+
+      .hamburger-btn {
+        background: none;
+        border: none;
+        font-size: 1.5rem;
+        color: var(--primary-color);
+        cursor: pointer;
+        margin-right: 20px;
+      }
+
+      .project-name {
+        padding : 10px 15px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary-color);
+      }
+
+      .header-right {
+        display: flex;
+        align-items: center;
+      }
+
+      .user-area {
+        position: relative;
+      }
+  body
+    .sidebar#sidebar
+      .sidebar-header
+        button.close-btn#close-sidebar &times;
+      h2.project-name ExamPortal
+      ul.sidebar-menu
+        li
+          a(href="/student/dashboard") Dashboard
+        li
+          a(href="/student/tests") Tests
+        li
+          a(href="/student/leaderboard") Leaderboard
+        li
+          a(href="/student/performance") My Performance
+
+    .content#content
+      header.header
+        .header-left
+          button.hamburger-btn#hamburger-btn &#9776;
+          span.project-name ExamPortal
+        .header-right
+          .user-dropdown
+            .user-avatar#user-avatar
+              if profileImage
+                img(src=profileImage, alt="Profile Image")
+              else
+                span#user-initials
+            .dropdown-content#user-dropdown-content
+              a(href="") Profile
+              a(href="/login.html") Logout
+
+      block content
+
+      footer.footer
+        .container
+          .footer-grid
+            .footer-col
+              h3 ExamPortal
+              p Empowering educators and students through technology
+            .footer-col
+              h4 Quick Links
+              ul
+                li
+                  a(href="/student/dashboard") Dashboard
+                li
+                  a(href="/student/tests") My Tests
+                li
+                  a(href="/student/leaderboard") Leaderboard
+                li
+                  a(href="/student/performance") Results
+            .footer-col
+              h4 Legal
+              ul
+                li
+                  a(href="") Privacy Policy
+                li
+                  a(href="") Terms of Service
+          .copyright
+            p &copy; 2025 ExamPortal. All rights reserved.
+
+    script.
+      const sidebar = document.getElementById('sidebar');
+      const content = document.getElementById('content');
+      const hamburgerBtn = document.getElementById('hamburger-btn');
+      const closeSidebarBtn = document.getElementById('close-sidebar');
+      const userAvatar = document.getElementById('user-avatar');
+      const userDropdownContent = document.getElementById('user-dropdown-content');
+
+      hamburgerBtn.addEventListener('click', () => {
+        sidebar.classList.add('open');
+        content.classList.add('open');
+      });
+
+      closeSidebarBtn.addEventListener('click', () => {
+        sidebar.classList.remove('open');
+        content.classList.remove('open');
+      });
+
+      userAvatar.addEventListener('click', () => {
+        userDropdownContent.classList.toggle('show');
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!userAvatar.contains(event.target) && !userDropdownContent.contains(event.target)) {
+          userDropdownContent.classList.remove('show');
+        }
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const userAvatarPlaceholder = document.getElementById('user-avatar');
+        const userInitialsSpan = document.createElement('span');
+        userInitialsSpan.id = 'user-initials-text';
+        const userNameElement = document.querySelector('h1'); // Try to get the h1 from the content block
+
+        if (userAvatarPlaceholder && userNameElement && !profileImage) {
+          const userName = userNameElement.textContent.trim();
+          if (userName) {
+            const initials = userName.split(' ').map(part => part.charAt(0).toUpperCase()).join('');
+            userInitialsSpan.textContent = initials;
+            userAvatarPlaceholder.appendChild(userInitialsSpan);
+          }
+        } else if (userAvatarPlaceholder && !profileImage) {
+          // Fallback if no h1 is found in the content block
+          userInitialsSpan.textContent = 'U'; // Default initial
+          userAvatarPlaceholder.appendChild(userInitialsSpan);
+        }
+      });

@@ -142,14 +142,51 @@ app.get('/student/dashboard', async (req, res) => {
             if (user && user.profileImage && user.profileImage.data) {
                 const imageData = user.profileImage.data.toString('base64');
                 const imageContentType = user.profileImage.contentType;
-                res.render('studentview', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
+                res.render('student/studentview', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
             } else {
-                res.render('studentview', { user: req.session.user, profileImage: null });
+                res.render('student/studentview', { user: req.session.user, profileImage: null });
             }
         } catch (error) {
             console.error("Error fetching user data for dashboard:", error);
-            res.render('studentview', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
+            res.render('student/studentview', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
         }
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/student/tests', (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('student')) {
+        res.render('student/tests', { user: req.session.user }); // Pass user data if needed
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/student/leaderboard', (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('student')) {
+        // Fetch leaderboard data here and pass it to the template
+        const leaderboardData = [
+            { rank: 1, name: 'Alice', score: 98 },
+            { rank: 2, name: 'Bob', score: 95 },
+            // ... more data
+        ];
+        res.render('student/leaderboard', { user: req.session.user, leaderboard: leaderboardData });
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/student/performance', (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('student')) {
+        // Fetch user's performance data here
+        const performanceData = {
+            math: 85,
+            science: 92,
+            english: 78,
+            // ... more data
+        };
+        res.render('student/performance', { user: req.session.user, performance: performanceData });
     } else {
         res.redirect('/login.html');
     }
@@ -162,13 +199,13 @@ app.get('/teacher/dashboard', async (req, res) => {
             if (user && user.profileImage && user.profileImage.data) {
                 const imageData = user.profileImage.data.toString('base64');
                 const imageContentType = user.profileImage.contentType;
-                res.render('teacherview', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
+                res.render('teacher/teacherview', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
             } else {
-                res.render('teacherview', { user: req.session.user, profileImage: null });
+                res.render('teacher/teacherview', { user: req.session.user, profileImage: null });
             }
         } catch (error) {
             console.error("Error fetching user data for dashboard:", error);
-            res.render('teacherview', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
+            res.render('teacher/teacherview', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
         }
     } else {
         res.redirect('/login.html');
@@ -183,13 +220,13 @@ app.get('/admin/dashboard', async (req, res) => {
             if (user && user.profileImage && user.profileImage.data) {
                 const imageData = user.profileImage.data.toString('base64');
                 const imageContentType = user.profileImage.contentType;
-                res.render('adminview', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
+                res.render('admin/adminview', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
             } else {
-                res.render('adminview', { user: req.session.user, profileImage: null });
+                res.render('admin/adminview', { user: req.session.user, profileImage: null });
             }
         } catch (error) {
             console.error("Error fetching user data for dashboard:", error);
-            res.render('adminview', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
+            res.render('admin/adminview', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
         }
     } else {
         res.redirect('/login.html');
