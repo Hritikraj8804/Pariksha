@@ -1,0 +1,22 @@
+extends layout
+
+block content
+  .courses-container
+    h1.courses-header My Courses
+    .course-list
+      .course-card
+        .course-info
+          h2.course-title Mathematics 101
+          p.course-description Introduction to fundamental mathematical concepts.
+        .course-actions
+          a(href="/teacher/courses/mathematics-101") View Details
+          a(href="/teacher/exams/create?course=mathematics-101") Create Exam
+
+      .course-card
+        .course-info
+          h2.course-title Science Fundamentals
+          p.course-description Exploring basic principles of biology, chemistry, and physics.
+        .course-actions
+          a(href="/teacher/courses/science-fundamentals") View Details
+          a(href="/teacher/exams/create?course=science-fundamentals") Create Exam
+

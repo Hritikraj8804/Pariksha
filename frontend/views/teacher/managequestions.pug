@@ -1,0 +1,31 @@
+extends layout
+
+block content
+  .manage-questions-container
+    h1.manage-questions-header Manage Questions
+    .questions-actions
+      a(href="/teacher/questions/create").button Add New Question
+
+    if questions && questions.length > 0
+      table.questions-table
+        thead
+          tr
+            th #
+            th Question Text
+            th Course
+            th Difficulty
+            th Actions
+        tbody
+          each question, index in questions
+            tr
+              td #{index + 1}
+              td #{question.text.substring(0, 100)}...
+              td #{question.course}
+              td #{question.difficulty}
+              td.actions
+                a(href="/teacher/questions/#{question.id}/edit").button.edit Edit
+                button.button.delete(data-question-id="#{question.id}") Delete
+
+    else
+      p No questions have been added yet. Click "Add New Question" to get started.
+

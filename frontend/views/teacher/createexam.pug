@@ -1,0 +1,32 @@
+extends layout
+
+block content
+  .create-exam-container
+    h1.create-exam-header Create New Exam
+    form(action="/teacher/exams", method="POST")
+      .form-group
+        label(for="title") Exam Title:
+        input(type="text", id="title", name="title", required=true)
+
+      .form-group
+        label(for="course") Course:
+        select(id="course", name="course", required=true)
+          option(value="") Select Course
+          option(value="mathematics") Mathematics 101
+          option(value="science") Science Fundamentals
+          // Add more courses dynamically
+
+      .form-group
+        label(for="duration") Duration (in minutes):
+        input(type="number", id="duration", name="duration", min="15", step="5", value="60", required=true)
+
+      .form-group
+        label(for="start_time") Start Time:
+        input(type="datetime-local", id="start_time", name="start_time", required=true)
+
+      .form-group
+        label(for="instructions") Instructions:
+        textarea(id="instructions", name="instructions", rows="4")
+
+      button(type="submit") Create Exam
+

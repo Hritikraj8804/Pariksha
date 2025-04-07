@@ -3,10 +3,10 @@ html(lang="en")
   head
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    title Exam Portal - Student Dashboard
+    title Exam Portal - Teacher Dashboard
     link(rel='stylesheet', href='/styles.css')
     style.
-      /* Specific styles for the student dashboard with sidebar */
+      /* Specific styles for the teacher dashboard */
       body {
       display: flex;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -274,13 +274,15 @@ html(lang="en")
       h2.project-name ExamPortal
       ul.sidebar-menu
         li
-          a(href="/student/dashboard") Dashboard
+          a(href="/teacher/dashboard") Dashboard
         li
-          a(href="/student/tests") Tests
+          a(href="/teacher/courses") My Courses
         li
-          a(href="/student/leaderboard") Leaderboard
+          a(href="/teacher/exams/create") Create Exam
         li
-          a(href="/student/performance") My Performance
+          a(href="/teacher/questions") Manage Questions
+        li
+          a(href="/teacher/results") View Results
 
     .content#content
       header.header
@@ -310,13 +312,11 @@ html(lang="en")
               h4 Quick Links
               ul
                 li
-                  a(href="/student/dashboard") Dashboard
+                  a(href="/teacher/dashboard") Dashboard
                 li
-                  a(href="/student/tests") My Tests
+                  a(href="/teacher/courses") My Courses
                 li
-                  a(href="/student/leaderboard") Leaderboard
-                li
-                  a(href="/student/performance") Results
+                  a(href="/teacher/exams/create") Create Exam
             .footer-col
               h4 Legal
               ul
@@ -370,7 +370,7 @@ html(lang="en")
           }
         } else if (userAvatarPlaceholder && !profileImage) {
           // Fallback if no h1 is found in the content block
-          userInitialsSpan.textContent = 'U'; // Default initial
+          userInitialsSpan.textContent = 'T'; // Default initial for Teacher
           userAvatarPlaceholder.appendChild(userInitialsSpan);
         }
       });

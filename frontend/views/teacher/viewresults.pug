@@ -1,0 +1,37 @@
+extends layout
+
+block content
+  .view-results-container
+    h1.view-results-header View Exam Results
+    .results-filter
+      label(for="exam") Select Exam:
+      select(id="exam", name="exam")
+        option(value="") All Exams
+        option(value="mathematics-101-exam") Mathematics 101 Exam
+        option(value="science-fundamentals-exam") Science Fundamentals Exam
+        // Add more exams dynamically
+      button Filter
+
+    if results && results.length > 0
+      table.results-table
+        thead
+          tr
+            th Student Name
+            th Exam Title
+            th Score
+            th Total Marks
+            th Date Taken
+            th Actions
+        tbody
+          each result in results
+            tr
+              td #{result.studentName}
+              td #{result.examTitle}
+              td #{result.score}
+              td #{result.totalMarks}
+              td #{new Date(result.dateTaken).toLocaleDateString()}
+              td.actions
+                a(href="/teacher/results/#{result.id}/details").button Details
+
+    else
+      p No results available for the selected criteria.

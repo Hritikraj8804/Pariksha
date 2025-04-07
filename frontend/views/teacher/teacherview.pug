@@ -1,236 +1,26 @@
-<!DOCTYPE html>
-html(lang="en")
-  head
-    meta(charset="UTF-8")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    title Exam Portal - Teacher Dashboard
-    link(rel='stylesheet', href='/styles.css')
-    style.
-      .dashboard-container {
-        max-width: 1000px;
-        margin: 80px auto;
-        padding: 20px;
-      }
+extends layout
 
-      .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #eee;
-      }
+block content
+  .dashboard-container
+    h1.dashboard-header Teacher Dashboard - #{user.name}
 
-      .dashboard-header h1 {
-        font-size: 2rem;
-        color: var(--dark-color);
-      }
+    .dashboard-summary
+      .summary-card
+        h3 #{activeCoursesCount || 0}
+        p Active Courses
+      .summary-card
+        h3 #{createdExamsCount || 0}
+        p Created Exams
+      .summary-card
+        h3 #{totalQuestionsCount || 0}
+        p Total Questions
+      .summary-card
+        h3 #{newResultsCount || 0}
+        p New Results
 
-      .user-info {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-      }
+    .recent-activity
+      h2 Recent Activity
+      ul
+        each activity in recentActivities || []
+          li #{activity.description} - #{activity.date}
 
-      .user-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-color: var(--primary-color);
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 1.2rem;
-        font-weight: bold;
-        overflow: hidden; /* To contain the image within the circle */
-      }
-
-      .user-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* Ensure the image fills the circle without distortion */
-      }
-
-
-      .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-        gap: 20px;
-      }
-
-      .dashboard-card {
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        padding: 20px;
-        transition: transform 0.3s ease;
-        border: 1px solid #eee;
-      }
-
-      .dashboard-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .card-title {
-        font-size: 1.3rem;
-        color: var(--dark-color);
-        margin-bottom: 10px;
-      }
-
-      .card-content p {
-        color: var(--text-light);
-        margin-bottom: 15px;
-      }
-
-      .card-actions a {
-        display: inline-block;
-        padding: 8px 15px;
-        border-radius: 5px;
-        text-decoration: none;
-        color: var(--primary-color);
-        border: 1px solid var(--primary-color);
-        transition: background-color 0.3s ease, color 0.3s ease;
-      }
-
-      .card-actions a:hover {
-        background-color: var(--primary-color);
-        color: white;
-      }
-
-      .course-list {
-        list-style: none;
-        padding: 0;
-      }
-
-      .course-list li {
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
-      }
-
-      .course-list li:last-child {
-        border-bottom: none;
-      }
-
-      .course-list li strong {
-        color: var(--dark-color);
-      }
-  body
-    nav.navbar
-      .nav-container
-        a.logo(href="/") ExamPortal
-
-        .menu-toggle#mobile-menu
-          span
-          span
-          span
-
-        .nav-links#nav-links
-          a(href="") Dashboard
-          a(href="") My Courses
-          a(href="") Create Exam
-          a(href="") Manage Questions
-          a(href="") View Results
-          .auth-links
-            .user-info
-              .user-avatar#user-initials
-                if profileImage
-                  img(src=profileImage, alt="Profile Image")
-                else
-                  span#user-initials-text
-              span#user-name #{user.name}
-            a.btn.btn-outline(href="/login.html") Logout
-
-
-    .dashboard-container
-      .dashboard-header
-        h1 #{user.name} Dashboard
-
-      .dashboard-grid
-        .dashboard-card
-          h2.card-title My Courses
-          .card-content
-            ul.course-list#my-courses
-              li
-                strong Mathematics 101
-              li
-                strong Science Fundamentals
-              li
-                strong English Literature
-            p.card-actions
-              a(href="") View All Courses
-
-        .dashboard-card
-          h2.card-title Recent Exams Created
-          .card-content
-            ul.course-list#recent-exams
-              li
-                strong Math Midterm - Created: April 5, 2025
-              li
-                strong Science Quiz - Created: April 1, 2025
-            p.card-actions
-              a(href="") Manage Exams
-
-        .dashboard-card
-          h2.card-title Quick Actions
-          .card-content
-            p
-              a.btn.btn-primary(href="") Create New Exam
-            p
-              a.btn.btn-outline(href="") Add New Question
-
-        .dashboard-card
-          h2.card-title View Recent Submissions
-          .card-content
-            p Check student submissions and grades.
-            p.card-actions
-              a(href="") View Submissions
-
-    footer.footer
-      .container
-        .footer-grid
-          .footer-col
-            h3 ExamPortal
-            p Empowering educators and students through technology
-          .footer-col
-            h4 Quick Links
-            ul
-              li
-                a(href="/teacher/dashboard") Dashboard
-              li
-                a(href="") My Courses
-              li
-                a(href="") Create Exam
-          .footer-col
-            h4 Legal
-            ul
-              li
-                a(href="") Privacy Policy
-              li
-                a(href="") Terms of Service
-        .copyright
-          p &copy; 2025 ExamPortal. All rights reserved.
-
-    script.
-      document.getElementById('mobile-menu').addEventListener('click', function() {
-        this.classList.toggle('active');
-        document.getElementById('nav-links').classList.toggle('active');
-      });
-
-      document.addEventListener('DOMContentLoaded', function() {
-        const userNamePlaceholder = document.getElementById('user-name');
-        const dashboardUserNamePlaceholder = document.getElementById('dashboard-user-name');
-        const userInitialsPlaceholder = document.getElementById('user-initials');
-        const dashboardUserInitialsPlaceholder = document.getElementById('dashboard-user-initials');
-        const userInitialsText = document.getElementById('user-initials-text');
-        const dashboardUserInitialsText = document.getElementById('dashboard-user-initials-text');
-
-        const userName = userNamePlaceholder.textContent.trim();
-
-        if (userName) {
-          const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
-          if (userInitialsText) userInitialsText.textContent = initials;
-          if (dashboardUserInitialsText) dashboardUserInitialsText.textContent = initials;
-        }
-      });

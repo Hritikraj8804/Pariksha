@@ -66,7 +66,6 @@ a {
   /* Outline Button (for secondary actions) */
   .btn-outline {
     background-color: transparent;
-    color: var(--white);
     border-color: var(--primary-color);
     padding: 8px 16px; /* Reduced padding */
     font-size: 0.9rem; /* Reduced font size */
