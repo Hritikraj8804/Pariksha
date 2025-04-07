@@ -262,18 +262,112 @@ app.get('/teacher/exams/create', async(req, res) => {
             if (user && user.profileImage && user.profileImage.data) {
                 const imageData = user.profileImage.data.toString('base64');
                 const imageContentType = user.profileImage.contentType;
-                res.render('teacher/createexam', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
+                res.render('teacher/createexam', {id: req.session.user._id , user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
             } else {
-                res.render('teacher/createexam', { user: req.session.user, profileImage: null });
+                res.render('teacher/createexam', {id: req.session.user._id , user: req.session.user, profileImage: null });
             }
         } catch (error) {
             console.error("Error fetching user data for dashboard:", error);
-            res.render('teacher/createexam', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
+            res.render('teacher/createexam', {id: req.session.user._id , user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
         }
     } else {
         res.redirect('/login.html');
     }
 });
+
+// In your main app.js file:
+const { Exam } = require('./models/exam'); // Adjust the path as necessary
+const { Question } = require('./models/exam'); // Adjust the path as necessary
+
+app.post('/teacher/exams', async (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('teacher')) {
+        try {
+
+            console.log("Entire req.body:", req.body);
+            const { teacherId, title, course, duration, description, questionSource } = req.body;
+const teacher_id = parseInt(teacherId); // Parse the string to a number
+
+            const newExam = new Exam({
+                teacherId: teacher_id, // Use the parsed number here
+                title: title,
+                course: course,
+                duration: parseInt(duration),
+                description: description
+            });
+
+            let savedExam = await newExam.save();
+            const examId = savedExam._id;
+            const createdQuestions = [];
+
+            if (questionSource === 'custom' && req.body.customQuestions) {
+                for (const questionData of Object.values(req.body.customQuestions)) {
+                    const newQuestion = new Question({
+                        examId: examId,
+                        text: questionData.text,
+                        options: questionData.options,
+                        correctOption: parseInt(questionData.correctOption)
+                    });
+                    const savedQuestion = await newQuestion.save();
+                    createdQuestions.push(savedQuestion._id);
+                }
+            } else if (questionSource === 'internet' && req.body.internetTopic && req.body.internetDifficulty && req.body.internetLimit) {
+                // Placeholder for fetching internet questions - REPLACE WITH YOUR LOGIC
+                async function fetchInternetQuestions(topic, difficulty, limit) {
+                    // Simulate fetching questions
+                    const questions = [];
+                    for (let i = 0; i < limit; i++) {
+                        questions.push({
+                            text: `Internet Question about <span class="math-inline">\{topic\} \(</span>{difficulty}) ${i + 1}`,
+                            options: ["Option A", "Option B", "Option C", "Option D"],
+                            correctOptionIndex: Math.floor(Math.random() * 4)
+                        });
+                    }
+                    return questions;
+                }
+
+                const fetchedQuestions = await fetchInternetQuestions(
+                    req.body.internetTopic,
+                    req.body.internetDifficulty,
+                    parseInt(req.body.internetLimit)
+                );
+                for (const fetchedQuestion of fetchedQuestions) {
+                    const newQuestion = new Question({
+                        examId: examId,
+                        text: fetchedQuestion.text,
+                        options: fetchedQuestion.options,
+                        correctOption: fetchedQuestion.correctOptionIndex
+                    });
+                    const savedQuestion = await newQuestion.save();
+                    createdQuestions.push(savedQuestion._id);
+                }
+            }
+
+            savedExam.questions = createdQuestions;
+            await savedExam.save();
+
+            res.redirect('/teacher/dashboard');
+
+        } catch (error) {
+            console.error('Error creating exam:', error);
+            res.status(500).send('Error creating exam.');
+        }
+    } else {
+        res.redirect('/login.html');
+    }
+});
+// Dummy function for fetching internet questions (replace with your actual logic)
+async function fetchInternetQuestions(topic, difficulty, limit) {
+    // Simulate fetching questions from an external source or your data
+    const dummyQuestions = [];
+    for (let i = 0; i < limit; i++) {
+        dummyQuestions.push({
+            text: `Internet Question ${i + 1} about ${topic} (${difficulty})`,
+            options: ['A', 'B', 'C', 'D'],
+            correctOptionIndex: Math.floor(Math.random() * 4)
+        });
+    }
+    return dummyQuestions;
+}
 
 app.get('/teacher/questions', async(req, res) => {
     if (req.session.user && req.session.user.roles.includes('teacher')) {

@@ -1,6 +1,5 @@
 extends layout
 
-
 block styles
   style.
     /* Styles for the Create Exam page */
@@ -70,20 +69,123 @@ block styles
       background-color: var(--primary-darker);
     }
 
-    /* You might need to adjust these variables based on your theme */
+    .question-source-options {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    .question-source-options label {
+      font-weight: normal;
+    }
+
+    .internet-questions-fields,
+    .custom-questions-section {
+      border: 1px solid #ddd;
+      padding: 20px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .custom-question {
+      border: 1px solid #eee;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+    }
+
+    .custom-question-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      font-weight: bold;
+      color: var(--dark-color);
+    }
+
+    .question-options-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+
+    .add-question-button,
+    .edit-question-button,
+    .delete-question-button,
+    .save-question-button {
+      background-color: var(--secondary-color); /* Example secondary color */
+      color: var(--white);
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-right: 5px;
+    }
+
+    .edit-question-button {
+      background-color: var(--warning-color); /* Example warning color */
+    }
+
+    .delete-question-button {
+      background-color: var(--danger-color); /* Example danger color */
+    }
+
+    .save-question-button {
+      background-color: var(--success-color); /* Example success color */
+    }
+
+    .add-question-button:hover,
+    .edit-question-button:hover,
+    .delete-question-button:hover,
+    .save-question-button:hover {
+      opacity: 0.8;
+    }
+
+    .question-body {
+      /* Initially visible */
+    }
+
+    .question-body.minimized {
+      display: none;
+    }
+
+    .question-summary {
+      margin-bottom: 10px;
+      font-style: italic;
+      color: var(--text-light);
+    }
+
+    .question-summary.hidden {
+      display: none;
+    }
+
+    /* New variables for colors */
     :root {
       --primary-color: #007bff;
       --primary-darker: #0056b3;
+      --secondary-color: #6c757d;
+      --warning-color: #ffc107;
+      --danger-color: #dc3545;
+      --success-color: #28a745;
       --light-color: #f8f9fa;
       --white: #fff;
       --text-color: #333;
       --dark-color: #212529;
+      --text-light: #6c757d;
     }
 
 block content
   .create-exam-container
     h1.create-exam-header Create New Exam
     form(action="/teacher/exams", method="POST").create-exam-form
+
+      // Optional: Display teacher's ID as a read-only field
+      .form-group
+        label(for="teacherIdDisplay") Teacher ID:
+        input(type="number", id="teacherId", name="teacherId", value=id, readonly=true)
+
       .form-group
         label(for="title") Exam Title:
         input(type="text", id="title", name="title", required=true)
@@ -94,18 +196,165 @@ block content
           option(value="") Select Course
           option(value="mathematics") Mathematics 101
           option(value="science") Science Fundamentals
+          option(value="other") Other
           // Add more courses dynamically
 
       .form-group
         label(for="duration") Duration (in minutes):
-        input(type="number", id="duration", name="duration", min="15", step="5", value="60", required=true)
+        input(type="number", id="duration", name="duration", min="5", step="5", value="60", required=true)
 
       .form-group
-        label(for="start_time") Start Time:
-        input(type="datetime-local", id="start_time", name="start_time", required=true)
+        label(for="description") Description:
+        textarea(id="description", name="description", rows="4")
 
-      .form-group
-        label(for="instructions") Instructions:
-        textarea(id="instructions", name="instructions", rows="4")
+      .form-group.question-source-options
+        label Question Source:
+        div
+          input(type="radio", id="source-internet", name="questionSource", value="internet")
+          label(for="source-internet") Internet
+        div
+          input(type="radio", id="source-custom", name="questionSource", value="custom", checked=true)
+          label(for="source-custom") Custom
+
+      #internet-questions-section.internet-questions-fields
+        .form-group
+          label(for="topic") Topic:
+          select(id="topic", name="internetTopic")
+            option(value="") Select Topic
+            option(value="linux") Linux Fundamentals
+            option(value="html") HTML Basics
+            option(value="python") Python Programming
+            // Add more topics dynamically
+
+        .form-group
+          label(for="difficulty") Difficulty:
+          select(id="difficulty", name="internetDifficulty")
+            option(value="") Select Difficulty
+            option(value="easy") Easy
+            option(value="medium") Medium
+            option(value="hard") Hard
+
+        .form-group
+          label(for="limit") Number of Questions:
+          input(type="number", id="limit", name="internetLimit", min="1", value="5")
+
+      #custom-questions-section.custom-questions-section
+        #custom-questions-list
+          // Questions will be added here
+        button(type="button").add-question-button Add Question
 
       button(type="submit").create-exam-button Create Exam
+
+  script.
+    const internetQuestionsSection = document.getElementById('internet-questions-section');
+    const customQuestionsSection = document.getElementById('custom-questions-section');
+    const internetSourceRadio = document.getElementById('source-internet');
+    const customSourceRadio = document.getElementById('source-custom');
+    const addQuestionButton = document.querySelector('.add-question-button');
+    const customQuestionsList = document.getElementById('custom-questions-list');
+    let questionCounter = 0;
+
+    function toggleQuestionSections() {
+      internetQuestionsSection.style.display = internetSourceRadio.checked ? 'block' : 'none';
+      customQuestionsSection.style.display = customSourceRadio.checked ? 'block' : 'none';
+    }
+
+    internetSourceRadio.addEventListener('change', toggleQuestionSections);
+    customSourceRadio.addEventListener('change', toggleQuestionSections);
+
+    function addNewQuestion() {
+      questionCounter++;
+      const questionDiv = document.createElement('div');
+      questionDiv.classList.add('custom-question');
+      questionDiv.dataset.questionId = questionCounter; // Store ID for tracking
+      questionDiv.innerHTML = `
+        <div class="custom-question-header">
+          <span class="question-number">Question ${questionCounter}</span>
+          <div>
+            <button type="button" class="edit-question-button" data-question-id="${questionCounter}">Edit</button>
+            <button type="button" class="delete-question-button" data-question-id="${questionCounter}">Delete</button>
+          </div>
+        </div>
+        <div class="question-summary hidden"></div>
+        <div class="question-body">
+          <div class="form-group">
+            <label for="question-text-${questionCounter}">Question Text:</label>
+            <textarea id="question-text-${questionCounter}" name="customQuestions[${questionCounter}][text]" rows="3" required></textarea>
+          </div>
+          <div class="form-group question-options-grid">
+            <div>
+              <label for="option-1-${questionCounter}">Option 1:</label>
+              <input type="text" id="option-1-${questionCounter}" name="customQuestions[${questionCounter}][options][0]" required>
+            </div>
+            <div>
+              <label for="option-2-${questionCounter}">Option 2:</label>
+              <input type="text" id="option-2-${questionCounter}" name="customQuestions[${questionCounter}][options][1]" required>
+            </div>
+            <div>
+              <label for="option-3-${questionCounter}">Option 3:</label>
+              <input type="text" id="option-3-${questionCounter}" name="customQuestions[${questionCounter}][options][2]" required>
+            </div>
+            <div>
+              <label for="option-4-${questionCounter}">Option 4:</label>
+              <input type="text" id="option-4-${questionCounter}" name="customQuestions[${questionCounter}][options][3]" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="correct-option-${questionCounter}">Correct Option:</label>
+            <select id="correct-option-${questionCounter}" name="customQuestions[${questionCounter}][correctOption]" required>
+              <option value="0">Option 1</option>
+              <option value="1">Option 2</option>
+              <option value="2">Option 3</option>
+              <option value="3">Option 4</option>
+            </select>
+          </div>
+          <button type="button" class="save-question-button" data-question-id="${questionCounter}">Save</button>
+        </div>
+      `;
+      customQuestionsList.appendChild(questionDiv);
+    }
+
+    addQuestionButton.addEventListener('click', addNewQuestion);
+
+    customQuestionsList.addEventListener('click', function(event) {
+      const questionDiv = event.target.closest('.custom-question');
+      if (!questionDiv) return; // Click was outside a question
+
+      const questionId = questionDiv.dataset.questionId;
+      const questionBody = questionDiv.querySelector('.question-body');
+      const questionSummary = questionDiv.querySelector('.question-summary');
+      const questionNumberSpan = questionDiv.querySelector('.question-number');
+
+      if (event.target.classList.contains('delete-question-button')) {
+        questionDiv.remove();
+        // Re-index the remaining questions visually
+        document.querySelectorAll('.question-number').forEach((span, index) => {
+          span.textContent = `Question ${index + 1}`;
+          span.closest('.custom-question').dataset.questionId = index + 1;
+          const editButton = span.closest('.custom-question').querySelector('.edit-question-button');
+          const deleteButton = span.closest('.custom-question').querySelector('.delete-question-button');
+          const saveButton = span.closest('.custom-question').querySelector('.save-question-button');
+          if (editButton) editButton.dataset.questionId = index + 1;
+          if (deleteButton) deleteButton.dataset.questionId = index + 1;
+          if (saveButton) saveButton.dataset.questionId = index + 1;
+          // Update names of input fields if needed for correct server-side parsing after reorder
+          // This can get complex, consider other ways to track questions if reordering is important
+        });
+      } else if (event.target.classList.contains('edit-question-button')) {
+        questionBody.classList.remove('minimized');
+        questionSummary.classList.add('hidden');
+      } else if (event.target.classList.contains('save-question-button')) {
+        const questionText = questionDiv.querySelector(`#question-text-${questionId}`).value.trim();
+        const options = Array.from(questionDiv.querySelectorAll(`.question-options-grid input[type="text"]`))
+          .map(input => input.value.trim());
+        const correctOptionIndex = questionDiv.querySelector(`#correct-option-${questionId}`).value;
+        const correctOptionText = options[correctOptionIndex];
+
+        questionSummary.textContent = `Q: ${questionText} | Correct: ${correctOptionText}`;
+        questionSummary.classList.remove('hidden');
+        questionBody.classList.add('minimized');
+      }
+    });
+
+    // Initialize the visibility of question sections
+    toggleQuestionSections();
