@@ -24,3 +24,71 @@ block content
         each activity in recentActivities || []
           li #{activity.description} - #{activity.date}
 
+block styles
+  style.
+    /* Specific styles for the teacher dashboard content */
+    .dashboard-container {
+      max-width: 960px;
+      margin: 30px auto;
+      padding: 20px;
+    }
+
+    .dashboard-header {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+      color: var(--dark-color);
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 10px;
+    }
+
+    .dashboard-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+
+    .summary-card {
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      text-align: center;
+    }
+
+    .summary-card h3 {
+      font-size: 1.8rem;
+      color: var(--primary-color);
+      margin-bottom: 5px;
+    }
+
+    .summary-card p {
+      color: var(--text-light);
+      font-size: 1rem;
+    }
+
+    .recent-activity {
+      margin-top: 30px;
+    }
+
+    .recent-activity h2 {
+      font-size: 1.6rem;
+      color: var(--dark-color);
+      margin-bottom: 10px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 5px;
+    }
+
+    .recent-activity ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .recent-activity li {
+      padding: 8px 0;
+      border-bottom: 1px dotted #ccc;
+    }
+
+    .recent-activity li:last-child {
+      border-bottom: none;
+    }

@@ -1,9 +1,89 @@
 extends layout
 
+
+block styles
+  style.
+    /* Styles for the Create Exam page */
+    .create-exam-container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 30px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .create-exam-header {
+      font-size: 2rem;
+      color: var(--dark-color);
+      margin-bottom: 30px;
+      text-align: center;
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 15px;
+    }
+
+    .create-exam-form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+      color: var(--text-color);
+    }
+
+    .form-group input[type="text"],
+    .form-group input[type="number"],
+    .form-group input[type="datetime-local"],
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      font-size: 1rem;
+      box-sizing: border-box; /* Ensure padding and border are included in the width */
+    }
+
+    .form-group textarea {
+      resize: vertical;
+    }
+
+    .create-exam-button {
+      background-color: var(--primary-color);
+      color: var(--white);
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1rem;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .create-exam-button:hover {
+      background-color: var(--primary-darker);
+    }
+
+    /* You might need to adjust these variables based on your theme */
+    :root {
+      --primary-color: #007bff;
+      --primary-darker: #0056b3;
+      --light-color: #f8f9fa;
+      --white: #fff;
+      --text-color: #333;
+      --dark-color: #212529;
+    }
+
 block content
   .create-exam-container
     h1.create-exam-header Create New Exam
-    form(action="/teacher/exams", method="POST")
+    form(action="/teacher/exams", method="POST").create-exam-form
       .form-group
         label(for="title") Exam Title:
         input(type="text", id="title", name="title", required=true)
@@ -28,5 +108,4 @@ block content
         label(for="instructions") Instructions:
         textarea(id="instructions", name="instructions", rows="4")
 
-      button(type="submit") Create Exam
-
+      button(type="submit").create-exam-button Create Exam

@@ -8,22 +8,30 @@ html(lang="en")
     style.
       /* Specific styles for the student dashboard with sidebar */
       body {
-      display: flex;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.6;
-      color: var(--text-color);
-      background-color: var(--light-color);
-      overflow-x: hidden; /* Prevent horizontal scroll due to sidebar */
-      padding-top: 65px; /* Add padding to the top of the body to account for the fixed header height (adjust if your header height is different) */
+        display: flex;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--text-color);
+        background-color: var(--light-color);
+        overflow-x: hidden;
+        padding-top: 65px; /* Header height */
+        min-height: 100vh;
+        padding-left: 0; /* Initial padding for closed sidebar */
+        transition: padding-left 0.3s ease-in-out;
+      }
+
+      body.open {
+        padding-left: 250px; /* Padding when sidebar is open */
       }
 
       .sidebar {
         background-color: var(--white);
         width: 250px;
-        height: 100vh;
-        position: fixed;
+        /* height: 100vh; Remove this */
+        position: absolute; /* Positioned relative to the body */
         left: -250px; /* Initially hidden */
         top: 0;
+        bottom: 0; /* Stretch to the bottom of the body */
         box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
         padding: 20px;
         transition: left 0.3s ease-in-out;
@@ -71,19 +79,13 @@ html(lang="en")
       }
 
       .content {
-        flex-grow: 1;
-        margin-left: 0; /* Adjusted by JavaScript when sidebar is open */
+        flex-grow: 1; /* Takes remaining width */
+        margin-left: 0; /* No initial left margin */
         transition: margin-left 0.3s ease-in-out;
-        /* No need for additional top padding here as the body has it */
       }
-
-      .content.open {
-        margin-left: 250px;
-      }
-
       .dashboard-container {
         max-width: 1000px;
-        margin: 20px auto; /* Adjusted margin */
+        margin: 20px auto;
         padding: 20px;
       }
 

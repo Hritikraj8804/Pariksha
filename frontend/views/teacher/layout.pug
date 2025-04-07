@@ -5,16 +5,19 @@ html(lang="en")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
     title Exam Portal - Teacher Dashboard
     link(rel='stylesheet', href='/styles.css')
+    block styles
     style.
       /* Specific styles for the teacher dashboard */
       body {
-      display: flex;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      line-height: 1.6;
-      color: var(--text-color);
-      background-color: var(--light-color);
-      overflow-x: hidden; /* Prevent horizontal scroll due to sidebar */
-      padding-top: 65px; /* Add padding to the top of the body to account for the fixed header height (adjust if your header height is different) */
+        display: flex;
+        flex-direction: column; /* Ensure content flows vertically */
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        color: var(--text-color);
+        background-color: var(--light-color);
+        overflow-x: hidden; /* Prevent horizontal scroll due to sidebar */
+        padding-top: 65px; /* Add padding to the top of the body to account for the fixed header height (adjust if your header height is different) */
+        min-height: 100vh; /* Ensure the body takes at least the full viewport height */
       }
 
       .sidebar {
@@ -71,7 +74,7 @@ html(lang="en")
       }
 
       .content {
-        flex-grow: 1;
+        flex-grow: 1; /* This is the crucial line! It makes the content expand to fill available space */
         margin-left: 0; /* Adjusted by JavaScript when sidebar is open */
         transition: margin-left 0.3s ease-in-out;
         /* No need for additional top padding here as the body has it */
@@ -302,30 +305,30 @@ html(lang="en")
 
       block content
 
-      footer.footer
-        .container
-          .footer-grid
-            .footer-col
-              h3 ExamPortal
-              p Empowering educators and students through technology
-            .footer-col
-              h4 Quick Links
-              ul
-                li
-                  a(href="/teacher/dashboard") Dashboard
-                li
-                  a(href="/teacher/courses") My Courses
-                li
-                  a(href="/teacher/exams/create") Create Exam
-            .footer-col
-              h4 Legal
-              ul
-                li
-                  a(href="") Privacy Policy
-                li
-                  a(href="") Terms of Service
-          .copyright
-            p &copy; 2025 ExamPortal. All rights reserved.
+    footer.footer
+      .container
+        .footer-grid
+          .footer-col
+            h3 ExamPortal
+            p Empowering educators and students through technology
+          .footer-col
+            h4 Quick Links
+            ul
+              li
+                a(href="/teacher/dashboard") Dashboard
+              li
+                a(href="/teacher/courses") My Courses
+              li
+                a(href="/teacher/exams/create") Create Exam
+          .footer-col
+            h4 Legal
+            ul
+              li
+                a(href="") Privacy Policy
+              li
+                a(href="") Terms of Service
+        .copyright
+          p &copy; 2025 ExamPortal. All rights reserved.
 
     script.
       const sidebar = document.getElementById('sidebar');

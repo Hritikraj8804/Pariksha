@@ -28,4 +28,80 @@ block content
 
     else
       p No questions have been added yet. Click "Add New Question" to get started.
+block styles 
+  style.
+    /* Specific styles for the Manage Questions page */
+    .manage-questions-container {
+      max-width: 960px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: var(--white);
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
 
+    .manage-questions-header h1 {
+      font-size: 2.2rem;
+      margin-bottom: 20px;
+      color: var(--dark-color);
+      border-bottom: 2px solid var(--primary-color);
+      padding-bottom: 10px;
+    }
+
+    .questions-actions {
+      margin-bottom: 20px;
+    }
+
+    .button {
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      color: var(--white);
+      background-color: var(--secondary-color);
+      transition: background-color 0.3s ease;
+      margin-right: 10px;
+    }
+
+    .button.edit {
+      background-color: var(--primary-color);
+    }
+
+    .button.delete {
+      background-color: var(--danger-color);
+      color: var(--white);
+      border: none;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      opacity: 0.9;
+    }
+
+    .questions-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .questions-table th,
+    .questions-table td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #eee;
+      text-align: left;
+    }
+
+    .questions-table th {
+      background-color: #f8f8f8;
+      font-weight: bold;
+      color: var(--dark-color);
+    }
+
+    .questions-table tbody tr:hover {
+      background-color: #f5f5f5;
+    }
+
+    .questions-table td.actions a,
+    .questions-table td.actions button {
+      margin-right: 5px;
+    }
