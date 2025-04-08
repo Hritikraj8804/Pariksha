@@ -1,0 +1,26 @@
+extends layout
+
+block content
+  .start-exam-container
+    h1 #{exam.title}
+    h1 #{examId}
+    h1 #{exam.title}
+
+    if questions && questions.length > 0
+      form(action="/student/submit-test" method="post")
+        input(type="number" name="examId" value=examId, readonly=true, id="examId") 
+        each question, index in questions
+          .question
+            h3 Question #{index + 1}: #{question.text}
+            input(type="hidden" name=`questions[${index}][questionId]` value=question.questionId) 
+            .options
+              each option, optionIndex in question.options
+                div
+                  input(type="radio" name=`questions[${index}][selectedOption]` value=optionIndex required)
+                  label #{option}
+        button(type="submit") Submit Test
+    else
+      p No questions available for this exam.
+
+  script.
+    // You can add client-side scripting here if needed

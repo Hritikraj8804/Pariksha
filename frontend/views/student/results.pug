@@ -1,0 +1,12 @@
+extends layout
+
+block content
+  .student-result-container
+    h1 Your Test Result
+
+    if result
+      p Exam Title: #{exam ? exam.title : 'Unknown Exam'}
+      p Your Score: #{result.score}
+      p Submitted At: #{result.submittedAt.toLocaleDateString()} #{result.submittedAt.toLocaleTimeString()}
+    else
+      p Error: Could not retrieve your result.
