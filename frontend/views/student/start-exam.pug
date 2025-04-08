@@ -1,26 +1,114 @@
 extends layout
 
 block content
+  style.
+    /* Styles for the Start Exam Page (All Questions on One Page) */
+    .start-exam-container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 30px;
+      background-color: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e0e0e0;
+    }
+
+    .start-exam-container h1 {
+      color: var(--primary-color);
+      font-size: 2.2rem;
+      text-align: center;
+      margin-bottom: 20px;
+      font-weight: 600;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 15px;
+    }
+
+    form {
+      margin-top: 20px;
+    }
+
+    .question {
+      background-color: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .question h3 {
+      color: var(--dark-color);
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin-bottom: 15px;
+    }
+
+    .options {
+      margin-left: 15px;
+    }
+
+    .options div {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+    }
+
+    .options input[type="radio"] {
+      margin-right: 10px;
+      cursor: pointer;
+    }
+
+    .options label {
+      color: var(--text-dark);
+      cursor: pointer;
+    }
+
+    button[type="submit"] {
+      background-color: var(--success-color);
+      color: var(--white);
+      border: none;
+      border-radius: 8px;
+      padding: 12px 25px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+      margin-top: 30px;
+      width: 150px; /* Adjust width as needed */
+      margin-left: auto;
+      margin-right: auto;
+      display: block; /* Make it a block-level element to center properly */
+    }
+
+    button[type="submit"]:hover {
+      background-color: red;
+    }
+
+    .no-questions {
+      text-align: center;
+      padding: 30px;
+      color: var(--text-light);
+      font-size: 1.1rem;
+    }
   .start-exam-container
     h1 #{exam.title}
-    h1 #{examId}
-    h1 #{exam.title}
+    //- You had examId and title repeated, I've kept title
+    //- h1 #{examId}
+    //- h1 #{exam.title}
 
     if questions && questions.length > 0
       form(action="/student/submit-test" method="post")
-        input(type="number" name="examId" value=examId, readonly=true, id="examId") 
+        input(type="hidden" name="examId" value=examId, readonly=true, id="examId")
         each question, index in questions
           .question
             h3 Question #{index + 1}: #{question.text}
-            input(type="hidden" name=`questions[${index}][questionId]` value=question.questionId) 
+            input(type="hidden" name=`questions[${index}][questionId]` value=question.questionId)
             .options
               each option, optionIndex in question.options
                 div
-                  input(type="radio" name=`questions[${index}][selectedOption]` value=optionIndex required)
-                  label #{option}
+                  input(type="radio" name=`questions[${index}][selectedOption]` value=optionIndex required id=`option-${index}-${optionIndex}`)
+                  label(for=`option-${index}-${optionIndex}`) #{option}
         button(type="submit") Submit Test
     else
-      p No questions available for this exam.
+      p.no-questions No questions available for this exam.
 
   script.
     // You can add client-side scripting here if needed

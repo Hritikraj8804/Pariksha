@@ -48,37 +48,43 @@ block content
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
     }
 
-    .tests-list li a {
+    .test-info {
+      flex-grow: 1;
+    }
+
+    .test-info a {
       text-decoration: none;
       color: var(--dark-color);
       font-weight: bold;
+      display: block; /* Make the entire title clickable if needed */
+      margin-bottom: 5px;
     }
 
-    .tests-list li span {
+    .test-info span {
       color: var(--text-light);
       font-size: 0.9rem;
     }
 
-    .no-tests {
-      text-align: center;
-      padding: 20px;
-      color: var(--text-light);
-    }
-
     .start-test-button {
-      background-color: var(--secondary-color);
+      background-color: #28a745; /* Green color for Start Test button */
       color: var(--white);
       border: none;
-      border-radius: var(--border-radius);
-      padding: var(--spacing-sm) var(--spacing-md);
-      font-size: var(--font-size-md);
+      border-radius: 5px;
+      padding: 10px 15px;
+      font-size: 1rem;
       cursor: pointer;
       text-decoration: none;
       transition: background-color 0.3s ease;
     }
 
     .start-test-button:hover {
-      opacity: 0.85;
+      background-color: #218838; /* Darker green on hover */
+    }
+
+    .no-tests {
+      text-align: center;
+      padding: 20px;
+      color: var(--text-light);
     }
   .tests-container
     .tests-header
@@ -88,8 +94,8 @@ block content
       ul.tests-list
         each exam in exams
           li
-            div
-              a(href="#") #{exam.title}
+            .test-info
+              a(href=`/student/start-test/${exam.examId}`) #{exam.title}
               span (#{exam.questionsCount} Questions)
             a.start-test-button(href=`/student/start-test/${exam.examId}`) Start Test
     else
