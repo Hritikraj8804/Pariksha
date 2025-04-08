@@ -1,13 +1,17 @@
 const mongoose = require('mongoose');
 
 const questionSchema = new mongoose.Schema({
+    questionId: {
+        type: Number,
+        unique: true // Ensure uniqueness for the numerical ID
+    },
     examId: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Number,
         ref: 'Exam',
         required: true
     },
-    teacherId: { // Add this field to track the creator
-        type: Number, // Assuming your teacher IDs in 'project' are Numbers
+    teacherId: {
+        type: Number,
         ref: 'project',
         required: true
     },
@@ -28,9 +32,27 @@ const questionSchema = new mongoose.Schema({
     }
 }, { versionKey: false });
 
+// Pre-save hook to auto-increment questionId
+questionSchema.pre('save', async function(next) {
+    if (!this.isNew) {
+        return next(); // Don't auto-increment on update
+    }
+    try {
+        const lastQuestion = await this.constructor.findOne({}, {}, { sort: { 'questionId': -1 } });
+        this.questionId = lastQuestion ? lastQuestion.questionId + 1 : 1;
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
+
 const examSchema = new mongoose.Schema({
+    examId: {
+        type: Number,
+        unique: true // Ensure uniqueness for the numerical ID
+    },
     teacherId: {
-        type: Number, // Assuming your teacher IDs in 'project' are Numbers
+        type: Number,
         ref: 'project',
         required: true
     },
@@ -53,9 +75,32 @@ const examSchema = new mongoose.Schema({
     questions: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Question'
-    }]
+    }],
+    difficulty: {
+        type: String,
+        enum: ['easy', 'medium', 'hard'],
+        default: 'medium'
+    },
+    limit: {
+        type: Number,
+        min: 1,
+        default: 10
+    }
 }, { versionKey: false });
 
+// Pre-save hook to auto-increment examId
+examSchema.pre('save', async function(next) {
+    if (!this.isNew) {
+        return next(); // Don't auto-increment on update
+    }
+    try {
+        const lastExam = await this.constructor.findOne({}, {}, { sort: { 'examId': -1 } });
+        this.examId = lastExam ? lastExam.examId + 1 : 1;
+        next();
+    } catch (error) {
+        next(error);
+    }
+});
 const activitySchema = new mongoose.Schema({
     teacherId: { 
         type: Number,
@@ -77,7 +122,7 @@ const resultSchema = new mongoose.Schema({
         required: true 
     },
     examId: { 
-        type: mongoose.Schema.Types.ObjectId, 
+        type: Number, 
         ref: 'Exam', 
         required: true 
     },

@@ -39,7 +39,6 @@ block styles
 
     .form-group input[type="text"],
     .form-group input[type="number"],
-    .form-group input[type="datetime-local"],
     .form-group select,
     .form-group textarea {
       width: 100%;
@@ -170,6 +169,15 @@ block styles
       border-radius: 5px;
     }
 
+    .warning-message {
+      background-color: #ffeeba;
+      color: #85640c;
+      border: 1px solid #ffed4a;
+      padding: 10px;
+      margin-bottom: 15px;
+      border-radius: 5px;
+    }
+
     /* New variables for colors */
     :root {
       --primary-color: #007bff;
@@ -185,6 +193,7 @@ block styles
       --text-light: #6c757d;
     }
 
+
 block content
   .create-exam-container
     h1.create-exam-header Create New Exam
@@ -192,6 +201,10 @@ block content
     if errorMessage
       .error-message
         p #{errorMessage}
+
+    if warningMessage
+      .warning-message
+        p #{warningMessage}
 
     form(action="/teacher/exams", method="POST").create-exam-form
 
@@ -218,6 +231,18 @@ block content
         input(type="number", id="duration", name="duration", min="5", step="5", value="60", required=true)
 
       .form-group
+        label(for="difficulty") Difficulty:
+        select(id="difficulty", name="difficulty", required=true)
+          option(value="") Select Difficulty
+          option(value="easy") Easy
+          option(value="medium") Medium
+          option(value="hard") Hard
+
+      .form-group
+        label(for="limit") Number of Questions:
+        input(type="number", id="limit", name="limit", min="1", value="0", required=true, readonly=true)
+
+      .form-group
         label(for="description") Description:
         textarea(id="description", name="description", rows="4")
 
@@ -230,7 +255,7 @@ block content
           input(type="radio", id="source-custom", name="questionSource", value="custom", checked=true)
           label(for="source-custom") Custom
 
-      #internet-questions-section.internet-questions-fields
+      #internet-questions-section.internet-questions-fields(style="display: none;")
         .form-group
           label(for="topic") Topic:
           select(id="topic", name="internetTopic")
@@ -241,16 +266,16 @@ block content
             // Add more topics dynamically
 
         .form-group
-          label(for="difficulty") Difficulty:
-          select(id="difficulty", name="internetDifficulty")
+          label(for="internetDifficulty") Difficulty:
+          select(id="internetDifficulty", name="internetDifficulty")
             option(value="") Select Difficulty
             option(value="easy") Easy
             option(value="medium") Medium
             option(value="hard") Hard
 
         .form-group
-          label(for="limit") Number of Questions:
-          input(type="number", id="limit", name="internetLimit", min="1", value="5")
+          label(for="internetLimit") Number of Questions to Fetch:
+          input(type="number", id="internetLimit", name="internetLimit", min="1", value="5")
 
       #custom-questions-section.custom-questions-section
         #custom-questions-list
@@ -266,6 +291,7 @@ block content
     const customSourceRadio = document.getElementById('source-custom');
     const addQuestionButton = document.querySelector('.add-question-button');
     const customQuestionsList = document.getElementById('custom-questions-list');
+    const questionLimitInput = document.getElementById('limit');
     let questionCounter = 0;
 
     function toggleQuestionSections() {
@@ -275,6 +301,10 @@ block content
 
     internetSourceRadio.addEventListener('change', toggleQuestionSections);
     customSourceRadio.addEventListener('change', toggleQuestionSections);
+
+    function updateQuestionCounter() {
+      questionLimitInput.value = document.querySelectorAll('.custom-question').length;
+    }
 
     function addNewQuestion() {
       questionCounter++;
@@ -326,6 +356,7 @@ block content
         </div>
       `;
       customQuestionsList.appendChild(questionDiv);
+      updateQuestionCounter();
     }
 
     addQuestionButton.addEventListener('click', addNewQuestion);
@@ -341,6 +372,7 @@ block content
 
       if (event.target.classList.contains('delete-question-button')) {
         questionDiv.remove();
+        updateQuestionCounter();
         // Re-index the remaining questions visually
         document.querySelectorAll('.question-number').forEach((span, index) => {
           span.textContent = `Question ${index + 1}`;
@@ -372,3 +404,19 @@ block content
 
     // Initialize the visibility of question sections
     toggleQuestionSections();
+
+    const createExamForm = document.querySelector('.create-exam-form');
+    createExamForm.addEventListener('submit', function(event) {
+      const numberOfQuestions = parseInt(document.getElementById('limit').value);
+      const intendedLimit = parseInt(document.querySelector('input[name="limit"]').value); // Get the initially set limit
+
+      if (numberOfQuestions !== intendedLimit && customSourceRadio.checked) {
+        event.preventDefault(); // Prevent form submission
+        const warningMessageElement = document.createElement('div');
+        warningMessageElement.classList.add('warning-message');
+        warningMessageElement.innerHTML = '<p>Warning: The number of added questions does not match the initially set limit.</p>';
+        const container = document.querySelector('.create-exam-container');
+        const header = document.querySelector('.create-exam-header');
+        container.insertBefore(warningMessageElement, header.nextSibling); // Display warning below header
+      }
+    });
