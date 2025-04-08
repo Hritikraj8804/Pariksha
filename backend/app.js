@@ -155,21 +155,160 @@ app.get('/student/dashboard', async (req, res) => {
     }
 });
 
-app.get('/student/tests', async(req, res) => {
+app.get('/student/tests', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {
         try {
             const user = await csemodel.findById(req.session.user._id);
+            let profileImageBase64 = null;
+            let imageContentType = null;
+            if (user && user.profileImage && user.profileImage.data) {
+                profileImageBase64 = user.profileImage.data.toString('base64');
+                imageContentType = user.profileImage.contentType;
+            }
+
+            // Fetch all exams and their question counts
+            const exams = await Exam.aggregate([
+                { $match: {} },
+                {
+                    $lookup: {
+                        from: 'questions',
+                        localField: 'examId',
+                        foreignField: 'examId',
+                        as: 'examQuestions'
+                    }
+                },
+                { $addFields: { questionsCount: { $size: '$examQuestions' } } },
+                { $project: { _id: 1, title: 1, examId: 1, questionsCount: 1 } }
+            ]);
+        
+            console.log("Exams array in /student/tests:", exams);
+            res.render('student/tests', {
+                user: req.session.user,
+                profileImage: profileImageBase64 ? `data:${imageContentType};base64,${profileImageBase64}` : null,
+                exams: exams
+            });
+
+        } catch (error) {
+            console.error("Error fetching tests:", error);
+            res.render('student/tests', {
+                user: req.session.user,
+                profileImage: null,
+                exams: [],
+                errorMessage: 'Could not load available tests.'
+            });
+        }
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+
+app.get('/student/start-test/:examId', async (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('student')) {
+        const examId = parseInt(req.params.examId); // PARSE TO INTEGER
+        console.log("examId in /student/start-test:", examId); // LOG THE VALUE
+
+        try {
+            const questions = await Question.find({ examId: examId }); // USE THE PARSED INTEGER
+            const exam = await Exam.findOne({ examId: examId }).select('title');
+            const user = await csemodel.findById(req.session.user._id);
+            
+            if (!exam) {
+                return res.status(404).send('Exam not found.');
+            }
+
+            if (questions.length > 0 ) {
+                res.render('student/start-exam', { user: req.session.user, examId : req.params.examId, exam: exam, questions: questions });
+            } else {
+                res.send('No questions found for this exam.');
+            }
+        } catch (error) {
+            console.error("Error starting test:", error);
+            res.status(500).send('Error starting the test.');
+        }
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+const StudentScore = require('./models/score.js'); 
+
+app.post('/student/submit-test', async (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('student')) {
+        const studentId = req.session.user._id;
+        const examId = parseInt(req.body.examId);
+        const submittedAnswers = req.body.questions;
+
+        try {
+            const correctQuestions = await Question.find({ examId: examId }).select('questionId correctOption');
+
+            let score = 0;
+            if (submittedAnswers && correctQuestions.length > 0) {
+                submittedAnswers.forEach(submittedAnswer => {
+                    const correctAnswerObject = correctQuestions.find(q => q.questionId === parseInt(submittedAnswer.questionId));
+                    if (correctAnswerObject && parseInt(submittedAnswer.selectedOption) === correctAnswerObject.correctOption) {
+                        score++;
+                    }
+                });
+
+                // Create a new StudentScore document
+                const studentScore = new StudentScore({
+                    studentId: studentId,
+                    examId: examId,
+                    score: score
+                });
+
+                await studentScore.save();
+
+                // Optionally, you might still want to save to the 'results' collection
+                // const result = new Result({ ... });
+                // await result.save();
+
+                res.redirect(`/student/results/${studentScore._id}`); // Redirect to a results page based on the StudentScore
+            } else {
+                res.send('No submitted answers or questions found for this exam.');
+            }
+
+        } catch (error) {
+            console.error("Error submitting test and saving score:", error);
+            res.status(500).send('Error submitting the test and saving the score.');
+        }
+    } else {
+        res.redirect('/login.html');
+    }
+});
+
+app.get('/student/results/:resultId', async (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('student')) {
+        const resultId = req.params.resultId;
+
+        try {
+            const studentResult = await StudentScore.findById(resultId);
+            const user = await csemodel.findById(req.session.user._id);
+            // If you are using the 'Result' model, change 'StudentScore' to 'Result'
+
+            if (!studentResult) {
+                return res.status(404).send('Result not found.');
+            }
+
+            // Now, fetch the Exam using the examId stored in the studentResult
+            const exam = await Exam.findOne({ examId: studentResult.examId }).select('title');
+
+            if (!exam) {
+                console.error(`Exam with examId ${studentResult.examId} not found.`);
+                // Optionally handle this error, maybe display a generic exam title
+            }
             if (user && user.profileImage && user.profileImage.data) {
                 const imageData = user.profileImage.data.toString('base64');
                 const imageContentType = user.profileImage.contentType;
-                res.render('student/tests', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
+                res.render('student/results', { user: req.session.user, result: studentResult, exam: exam, profileImage: `data:${imageContentType};base64,${imageData}` });
             } else {
-                res.render('student/tests', { user: req.session.user, profileImage: null });
+                res.render('student/results', { user: req.session.user,  result: studentResult, exam: exam,profileImage: null });
             }
         } catch (error) {
-            console.error("Error fetching user data for dashboard:", error);
-            res.render('student/tests', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
-        } 
+            console.error("Error fetching student result:", error);
+            res.status(500).send('Error fetching the result.');
+        }
     } else {
         res.redirect('/login.html');
     }
@@ -225,8 +364,8 @@ app.get('/teacher/dashboard', async (req, res) => {
             // Fetch teacher's user data
             const user = await csemodel.findById(teacherId);
 
-            // Fetch exams created by the logged-in teacher
-            const createdExamsCount = await Exam.countDocuments({ teacherId: teacherId });
+            // Fetch exams created by the logged-in teacher (only title and _id for listing)
+            const createdExams = await Exam.find({ teacherId: teacherId }).select('_id title');
 
             // Fetch total questions created by the logged-in teacher
             const totalQuestionsCount = await Question.countDocuments({ teacherId: teacherId });
@@ -246,7 +385,7 @@ app.get('/teacher/dashboard', async (req, res) => {
             res.render('teacher/teacherview', {
                 user: req.session.user,
                 profileImage: profileImageBase64 ? `data:${imageContentType};base64,${profileImageBase64}` : null,
-                createdExamsCount: createdExamsCount || 0,
+                createdExams: createdExams || [], // Pass the list of created exams
                 totalQuestionsCount: totalQuestionsCount || 0,
                 recentActivities: recentActivities || []
             });
@@ -264,50 +403,61 @@ app.get('/teacher/dashboard', async (req, res) => {
     }
 });
 
-
-app.get('/teacher/exams/create', async(req, res) => {
+app.get('/teacher/exams/create', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('teacher')) {
         try {
             const user = await csemodel.findById(req.session.user._id);
+            let profileImageBase64 = null;
+            let imageContentType = null;
             if (user && user.profileImage && user.profileImage.data) {
-                const imageData = user.profileImage.data.toString('base64');
-                const imageContentType = user.profileImage.contentType;
-                res.render('teacher/createexam', {id: req.session.user._id , user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
-            } else {
-                res.render('teacher/createexam', {id: req.session.user._id , user: req.session.user, profileImage: null });
+                profileImageBase64 = user.profileImage.data.toString('base64');
+                imageContentType = user.profileImage.contentType;
             }
+            res.render('teacher/createexam', {
+                id: req.session.user._id,
+                user: req.session.user,
+                profileImage: profileImageBase64 ? `data:${imageContentType};base64,${profileImageBase64}` : null,
+                errorMessage: null // Ensure errorMessage is initially null
+            });
         } catch (error) {
-            console.error("Error fetching user data for dashboard:", error);
-            res.render('teacher/createexam', {id: req.session.user._id , user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
+            console.error("Error fetching user data for create exam:", error);
+            res.render('teacher/createexam', {
+                id: req.session.user._id,
+                user: req.session.user,
+                profileImage: null,
+                errorMessage: 'Could not load profile information.'
+            });
         }
     } else {
         res.redirect('/login.html');
     }
 });
-
 app.post('/teacher/exams', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('teacher')) {
         try {
             console.log("Entire req.body:", req.body);
-            const { teacherId, title, course, duration, description, questionSource } = req.body;
+            const { teacherId, title, course, duration, description, questionSource, difficulty, limit } = req.body;
             const teacher_id = parseInt(teacherId); // Parse the string to a number
+            const examLimit = parseInt(limit);
 
             const newExam = new Exam({
                 teacherId: teacher_id, // Use the parsed number here
                 title: title,
                 course: course,
                 duration: parseInt(duration),
-                description: description
+                description: description,
+                difficulty: difficulty,
+                limit: examLimit
             });
 
             let savedExam = await newExam.save();
-            const examId = savedExam._id;
+            const currentExamId = savedExam.examId; // Get the numerical examId
             const createdQuestions = [];
 
             if (questionSource === 'custom' && req.body.customQuestions) {
                 for (const questionData of Object.values(req.body.customQuestions)) {
                     const newQuestion = new Question({
-                        examId: examId,
+                        examId: currentExamId, // Use the numerical examId here
                         teacherId: teacher_id,
                         text: questionData.text,
                         options: questionData.options,
@@ -338,7 +488,7 @@ app.post('/teacher/exams', async (req, res) => {
                 );
                 for (const fetchedQuestion of fetchedQuestions) {
                     const newQuestion = new Question({
-                        examId: examId,
+                        examId: currentExamId, // Use the numerical examId here
                         teacherId: teacher_id,
                         text: fetchedQuestion.text,
                         options: fetchedQuestion.options,
@@ -364,6 +514,9 @@ app.post('/teacher/exams', async (req, res) => {
             let errorMessage = 'Error creating exam.';
             if (error.code === 11000 && error.keyPattern && error.keyPattern.title) {
                 errorMessage = 'Exam title already exists. Please choose a different title.';
+            } else if (error.errors && Object.keys(error.errors).length > 0) {
+                // Extract specific validation errors
+                errorMessage = Object.values(error.errors).map(err => err.message).join('<br>');
             }
             console.error('Error creating exam:', error);
 
@@ -380,7 +533,7 @@ app.post('/teacher/exams', async (req, res) => {
                     id: req.session.user._id,
                     user: req.session.user,
                     profileImage: profileImageBase64 ? `data:${imageContentType};base64,${profileImageBase64}` : null,
-                    errorMessage: errorMessage // Pass the error message to the template
+                    errorMessage: errorMessage
                 });
             } catch (userError) {
                 console.error("Error fetching user data for re-rendering:", userError);
@@ -396,6 +549,7 @@ app.post('/teacher/exams', async (req, res) => {
         res.redirect('/login.html');
     }
 });
+
 // Dummy function for fetching internet questions (replace with your actual logic)
 async function fetchInternetQuestions(topic, difficulty, limit) {
     // Simulate fetching questions from an external source or your data
@@ -410,23 +564,94 @@ async function fetchInternetQuestions(topic, difficulty, limit) {
     return dummyQuestions;
 }
 
-app.get('/teacher/questions', async(req, res) => {
+app.get('/teacher/questions', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('teacher')) {
         try {
-            const user = await csemodel.findById(req.session.user._id);
+            const teacherId = req.session.user._id;
+
+            // Fetch all exams created by the logged-in teacher, including difficulty and limit
+            const exams = await Exam.find({ teacherId: teacherId }).select('_id title difficulty limit');
+
+            // Initially, no exam is selected
+            const selectedExam = null;
+            const questions = [];
+
+            // Fetch the teacher's user data for profile image (optional)
+            const user = await csemodel.findById(teacherId);
+            let profileImageBase64 = null;
+            let imageContentType = null;
             if (user && user.profileImage && user.profileImage.data) {
-                const imageData = user.profileImage.data.toString('base64');
-                const imageContentType = user.profileImage.contentType;
-                res.render('teacher/managequestions', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
-            } else {
-                res.render('teacher/managequestions', { user: req.session.user, profileImage: null });
+                profileImageBase64 = user.profileImage.data.toString('base64');
+                imageContentType = user.profileImage.contentType;
             }
+
+            res.render('teacher/managequestions', {
+                user: req.session.user,
+                profileImage: profileImageBase64 ? `data:${imageContentType};base64,${profileImageBase64}` : null,
+                exams: exams,
+                selectedExam: selectedExam,
+                questions: questions
+            });
+
         } catch (error) {
-            console.error("Error fetching user data for dashboard:", error);
-            res.render('teacher/managequestions', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
+            console.error("Error fetching exams:", error);
+            res.render('teacher/managequestions', {
+                user: req.session.user,
+                profileImage: null,
+                exams: [],
+                selectedExam: null,
+                questions: [],
+                errorMessage: 'Could not load exams.'
+            });
         }
     } else {
         res.redirect('/login.html');
+    }
+});
+
+// Route to fetch details of a specific exam (including difficulty and limit)
+app.get('/teacher/questions/:examId/details', async (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('teacher')) {
+        try {
+            const teacherId = req.session.user._id;
+            const examId = req.params.examId;
+
+            const exam = await Exam.findOne({ _id: examId, teacherId: teacherId }).select('_id title difficulty limit');
+
+            if (exam) {
+                res.json({ success: true, examDetails: exam });
+            } else {
+                res.status(404).json({ success: false, message: 'Exam not found or unauthorized.' });
+            }
+        } catch (error) {
+            console.error("Error fetching exam details:", error);
+            res.status(500).json({ success: false, message: 'Could not load exam details.' });
+        }
+    } else {
+        res.status(401).json({ success: false, message: 'Unauthorized.' });
+    }
+});
+
+// Route to fetch questions for a specific exam
+app.get('/teacher/questions/:examId/questions', async (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('teacher')) {
+        try {
+            const teacherId = req.session.user._id;
+            const examId = req.params.examId;
+
+            const exam = await Exam.findOne({ _id: examId, teacherId: teacherId }).populate('questions');
+
+            if (exam) {
+                res.json({ success: true, questions: exam.questions, selectedExam: { _id: exam._id, title: exam.title } });
+            } else {
+                res.status(404).json({ success: false, message: 'Exam not found or unauthorized.' });
+            }
+        } catch (error) {
+            console.error("Error fetching questions for exam:", error);
+            res.status(500).json({ success: false, message: 'Could not load questions for this exam.' });
+        }
+    } else {
+        res.status(401).json({ success: false, message: 'Unauthorized.' });
     }
 });
 

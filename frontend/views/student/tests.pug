@@ -5,25 +5,26 @@ block content
     /* Styles for the Tests page */
     .tests-container {
       max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
+      margin: 30px auto; /* Increased top/bottom margin for better spacing */
+      padding: 30px; /* Increased padding */
       background-color: var(--white);
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-      border: 1px solid #eee;
+      border-radius: 10px; /* Slightly more rounded corners */
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08); /* Softer, more prominent shadow */
+      border: 1px solid #e0e0e0; /* Slightly darker border */
     }
 
     .tests-header {
       text-align: center;
-      margin-bottom: 30px;
-      padding-bottom: 20px;
+      margin-bottom: 40px; /* Increased margin */
+      padding-bottom: 25px;
       border-bottom: 2px solid var(--primary-color);
     }
 
     .tests-header h1 {
       color: var(--dark-color);
-      font-size: 2rem;
-      margin-bottom: 10px;
+      font-size: 2.5rem; /* Slightly larger font */
+      margin-bottom: 15px;
+      font-weight: 600; /* Semi-bold font weight */
     }
 
     .tests-list {
@@ -33,46 +34,73 @@ block content
 
     .tests-list li {
       background-color: #f9f9f9;
-      border: 1px solid #eee;
-      border-radius: 5px;
-      margin-bottom: 10px;
-      padding: 15px;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px; /* More rounded corners */
+      margin-bottom: 15px; /* Increased margin */
+      padding: 20px; /* Increased padding */
       display: flex;
       justify-content: space-between;
       align-items: center;
-      transition: transform 0.3s ease;
+      transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out; /* Smoother transitions */
     }
 
     .tests-list li:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+      transform: translateY(-5px); /* Slightly more pronounced hover effect */
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1); /* More noticeable shadow on hover */
     }
 
     .tests-list li a {
       text-decoration: none;
       color: var(--dark-color);
-      font-weight: bold;
+      font-weight: 500; /* Slightly less bold */
+      font-size: 1.1rem; /* Slightly larger font */
     }
 
     .tests-list li span {
       color: var(--text-light);
-      font-size: 0.9rem;
+      font-size: 1rem; /* Slightly larger font */
+      margin-left: 10px; /* Add some spacing */
     }
 
     .no-tests {
       text-align: center;
-      padding: 20px;
+      padding: 30px; /* Increased padding */
       color: var(--text-light);
+      font-size: 1.1rem; /* Slightly larger font */
+    }
+
+    .start-test-button {
+      background-color: var(--secondary-color);
+      color: var(--white);
+      border: none;
+      border-radius: 8px; /* More rounded corners */
+      padding: 12px 20px; /* Adjusted padding */
+      font-size: 1rem; /* Adjusted font size */
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.2s ease-in-out, opacity 0.2s ease-in-out; /* Smoother transitions */
+    }
+
+    .start-test-button:hover {
+      background-color: darken(var(--secondary-color), 10%); /* Darken on hover */
+      opacity: 1; /* Ensure full opacity on hover */
     }
   .tests-container
     .tests-header
       h1 Available Tests for #{user.name}
 
-    if tests && tests.length > 0
+    if exams && exams.length > 0
       ul.tests-list
-        each test in tests
+        each exam in exams
           li
-            a(href=test.link) #{test.name}
-            span (#{test.questionsCount} Questions)
+            div
+              a(href="#") #{exam.title}
+              span (#{exam.questionsCount} Questions)
+            a.start-test-button(href=`/student/start-test/${exam.examId}`) Start Test
     else
       p.no-tests No tests available at the moment.
+
+  script.
+    document.addEventListener('DOMContentLoaded', () => {
+      // You can add any client-side scripting here if needed
+    });

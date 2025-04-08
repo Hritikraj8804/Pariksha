@@ -12,6 +12,11 @@
   --text-light: #6c757d;
   --white: white;
 }
+.score-display {
+  color: #28a745; /* A more standard, visible green for success */
+  font-size: 1.4rem; /* Slightly larger for emphasis */
+  font-weight: bold; /* Make it stand out */
+}
 
 * {
   margin: 0;

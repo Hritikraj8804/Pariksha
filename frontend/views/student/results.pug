@@ -1,0 +1,107 @@
+extends layout
+
+block content
+  style.
+    /* Styles for the Student Result Page */
+    .student-result-container {
+      max-width: 600px;
+      margin: 40px auto;
+      padding: 30px;
+      background-color: var(--white);
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e0e0e0;
+      text-align: center;
+    }
+
+    .student-result-container h1 {
+      color: var(--primary-color);
+      font-size: 2.5rem;
+      margin-bottom: 30px;
+      font-weight: 600;
+      border-bottom: 2px solid #f0f0f0;
+      padding-bottom: 15px;
+    }
+
+    .result-info {
+      margin-bottom: 30px; /* Increased margin for buttons */
+    }
+
+    .result-info p {
+      font-size: 1.1rem;
+      color: var(--text-dark);
+      margin-bottom: 10px;
+    }
+
+    .result-info p strong {
+      font-weight: 500;
+      color: var(--secondary-color);
+    }
+
+    .score-display {
+      color: #28a745; /* A more standard, visible green for success */
+      font-size: 1.4rem; /* Slightly larger for emphasis */
+      font-weight: bold; /* Make it stand out */
+    }
+
+    .error-message {
+      color: var(--error-color);
+      font-size: 1.1rem;
+      padding: 20px;
+      background-color: #ffebee;
+      border: 1px solid #ef9a9a;
+      border-radius: 5px;
+      margin-bottom: 30px; /* Add margin below error message */
+    }
+
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 15px; /* Space between buttons */
+      margin-top: 20px; /* Add some space above the buttons */
+    }
+
+    .action-button {
+      display: inline-block;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      text-decoration: none;
+      color: var(--white);
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .try-again-button {
+      background-color: var(--warning-color);
+    }
+
+    .try-again-button:hover {
+      background-color: #28a745;
+    }
+
+    .dashboard-button {
+      background-color: var(--accent-color);
+    }
+
+    .dashboard-button:hover {
+      background-color: var(--secondary-color); /* Corrected syntax */
+    }
+
+  .student-result-container
+    h1 Your Test Result
+
+    if result
+      .result-info
+        p <strong>Exam Title:</strong> #{exam ? exam.title : 'Unknown Exam'}
+        p <strong>Your Score:</strong> <span class="score-display">#{result.score}</span>
+        p <strong>Submitted At:</strong> #{result.submittedAt.toLocaleDateString()} #{result.submittedAt.toLocaleTimeString()}
+      .button-container
+        a.action-button.dashboard-button(href="/student/dashboard") Dashboard
+        a.action-button.try-again-button(href="/student/tests") Try Again
+    else
+      p.error-message Error: Could not retrieve your result.
+      .button-container
+        a.action-button.dashboard-button(href="/student/dashboard") Dashboard
+        a.action-button.try-again-button(href="/student/tests") Try Again
