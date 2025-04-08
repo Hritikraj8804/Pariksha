@@ -1,107 +1,308 @@
 extends layout
 
 block content
-  .manage-questions-container
-    h1.manage-questions-header Manage Questions
-    .questions-actions
-      a(href="/teacher/questions/create").button Add New Question
+  .manage-dashboard-container
+    h1.manage-dashboard-header Manage Exams & Questions
 
-    if questions && questions.length > 0
-      table.questions-table
-        thead
-          tr
-            th #
-            th Question Text
-            th Course
-            th Difficulty
-            th Actions
-        tbody
-          each question, index in questions
-            tr
-              td #{index + 1}
-              td #{question.text.substring(0, 100)}...
-              td #{question.course}
-              td #{question.difficulty}
-              td.actions
-                a(href="/teacher/questions/#{question.id}/edit").button.edit Edit
-                button.button.delete(data-question-id="#{question.id}") Delete
+    .exams-list-card
+      h2 Exams
+      if exams && exams.length > 0
+        ul.exams-ul
+          each exam in exams
+            li.exam-item(data-exam-id="#{exam._id}")
+              span.exam-title #{exam.title}
+              .exam-actions
+                a.button.edit(href="/teacher/questions/#{exam._id}/edit")
+                  i.fas.fa-edit
+                  span Edit
+                button.button.delete-exam(data-exam-id="#{exam._id}")
+                  i.fas.fa-trash-alt
+                  span Delete
+                button.button.view-questions(data-exam-id="#{exam._id}")
+                  i.fas.fa-eye
+                  span View Questions
+        a.button.create-new(href="/teacher/exams/create")
+          i.fas.fa-plus-circle
+          span Create New Exam
+      else
+        p.empty-message No exams created yet.
+        a.button.create-new(href="/teacher/exams/create")
+          i.fas.fa-plus-circle
+          span Create New Exam
 
-    else
-      p No questions have been added yet. Click "Add New Question" to get started.
-block styles 
+    #questions-section.questions-card(style="display: none;")
+      if selectedExam
+        h2 Questions for:
+          span.selected-exam-title #{selectedExam.title}
+        .questions-actions
+          a.button.create-new(href="/teacher/questions/#{selectedExam._id}/questions/create")
+            i.fas.fa-plus-circle
+            span Add New Question
+        if questions && questions.length > 0
+          ul.questions-ul
+            each question in questions
+              li.question-item(data-question-id="#{question._id}")
+                span.question-text #{question.text.substring(0, 100)}...
+                .question-actions
+                  a.button.edit(href="/teacher/questions/#{question._id}/edit")
+                    i.fas.fa-edit
+                    span Edit
+                  button.button.delete-question(data-question-id="#{question._id}")
+                    i.fas.fa-trash-alt
+                    span Delete
+        else
+          p.empty-message No questions in this exam yet.
+      else
+        p.info-message Select an exam to view its questions.
+
+block styles
   style.
-    /* Specific styles for the Manage Questions page */
-    .manage-questions-container {
-      max-width: 960px;
-      margin: 30px auto;
-      padding: 20px;
-      background-color: var(--white);
-      border-radius: 8px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    /* General Styles */
+    :root {
+      --primary-color: #007bff;
+      --secondary-color: #28a745;
+      --danger-color: #dc3545;
+      --light-color: #f8f9fa;
+      --dark-color: #343a40;
+      --white: #fff;
+      --text-color: #333;
+      --border-color: #ddd;
+      --box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      --spacing-sm: 0.5rem;
+      --spacing-md: 1rem;
+      --spacing-lg: 1.5rem;
+      --border-radius: 5px;
+      --font-size-sm: 0.8rem;
+      --font-size-md: 1rem;
+      --font-size-lg: 1.2rem;
     }
 
-    .manage-questions-header h1 {
-      font-size: 2.2rem;
-      margin-bottom: 20px;
+    body {
+      font-family: sans-serif;
+      background-color: var(--light-color);
+      color: var(--text-color);
+      margin: 20px;
+    }
+
+    .manage-dashboard-container {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .manage-dashboard-header {
+      color: var(--primary-color);
+      margin-bottom: var(--spacing-lg);
+      text-align: center;
+    }
+
+    /* Card Styles */
+    .exams-list-card, .questions-card {
+      background-color: var(--white);
+      border: 1px solid var(--border-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .exams-list-card h2, .questions-card h2 {
       color: var(--dark-color);
       border-bottom: 2px solid var(--primary-color);
-      padding-bottom: 10px;
+      padding-bottom: var(--spacing-sm);
+      margin-bottom: var(--spacing-md);
     }
 
-    .questions-actions {
-      margin-bottom: 20px;
+    .exams-ul, .questions-ul {
+      list-style: none;
+      padding: 0;
     }
 
+    .exam-item, .question-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-md) 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .exam-item:last-child, .question-item:last-child {
+      border-bottom: none;
+    }
+
+    .exam-title, .question-text {
+      flex-grow: 1;
+      margin-right: var(--spacing-md);
+    }
+
+    /* Button Styles */
     .button {
-      display: inline-block;
-      padding: 8px 15px;
-      border-radius: 5px;
-      text-decoration: none;
-      color: var(--white);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       background-color: var(--secondary-color);
+      color: var(--white);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-md);
+      cursor: pointer;
       transition: background-color 0.3s ease;
-      margin-right: 10px;
+      text-decoration: none;
+      margin-left: var(--spacing-sm);
+    }
+
+    .button i {
+      margin-right: var(--spacing-sm);
     }
 
     .button.edit {
       background-color: var(--primary-color);
     }
 
-    .button.delete {
+    .button.delete-exam, .button.delete-question {
       background-color: var(--danger-color);
-      color: var(--white);
-      border: none;
-      cursor: pointer;
+    }
+
+    .button.create-new {
+      background-color: var(--secondary-color);
+      margin-top: var(--spacing-md);
     }
 
     .button:hover {
-      opacity: 0.9;
+      opacity: 0.85;
     }
 
-    .questions-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 20px;
+    .exam-actions, .question-actions {
+      display: flex;
+      gap: var(--spacing-sm);
     }
 
-    .questions-table th,
-    .questions-table td {
-      padding: 12px 15px;
-      border-bottom: 1px solid #eee;
-      text-align: left;
+    /* Empty/Info Messages */
+    .empty-message, .info-message {
+      color: var(--text-light);
+      font-style: italic;
+      margin-top: var(--spacing-md);
     }
 
-    .questions-table th {
-      background-color: #f8f8f8;
+    .questions-card h2 {
+      display: flex;
+      align-items: center;
+      gap: var(--spacing-sm);
+    }
+
+    .questions-card h2 .selected-exam-title {
+      color: var(--primary-color);
       font-weight: bold;
-      color: var(--dark-color);
     }
 
-    .questions-table tbody tr:hover {
-      background-color: #f5f5f5;
-    }
+    script(src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous")
+    script.
+        document.addEventListener('DOMContentLoaded', () => {
+        const examsList = document.querySelector('.exams-ul');
+        const questionsSection = document.getElementById('questions-section');
 
-    .questions-table td.actions a,
-    .questions-table td.actions button {
-      margin-right: 5px;
-    }
+        if (examsList) {
+            examsList.addEventListener('click', async (event) => {
+            const viewQuestionsButton = event.target.closest('.view-questions');
+            if (viewQuestionsButton) {
+                const examId = viewQuestionsButton.dataset.examId;
+                try {
+                const response = await fetch(`/teacher/exams/${examId}/questions`);
+                const data = await response.json();
+                if (data.success) {
+                    questionsSection.innerHTML = `
+                    <h2><i class="fas fa-question-circle"></i> Questions for: <span class="selected-exam-title">${data.selectedExam.title}</span></h2>
+                    <div class="questions-actions">
+                        <a href="/teacher/exams/${data.selectedExam._id}/questions/create" class="button create-new"><i class="fas fa-plus-circle"></i> Add New Question</a>
+                    </div>
+                    ${data.questions.length > 0 ? `
+                        <ul class="questions-ul">
+                        ${data.questions.map(question => `
+                            <li class="question-item" data-question-id="${question._id}">
+                            <span class="question-text">${question.text.substring(0, 100)}...</span>
+                            <div class="question-actions">
+                                <a href="/teacher/questions/${question._id}/edit" class="button edit"><i class="fas fa-edit"></i> Edit</a>
+                                <button class="button delete-question" data-question-id="${question._id}"><i class="fas fa-trash-alt"></i> Delete</button>
+                            </div>
+                            </li>
+                        `).join('')}
+                        </ul>
+                    ` : '<p class="empty-message">No questions in this exam yet.</p>'}
+                    `;
+                    questionsSection.style.display = 'block';
+                } else {
+                    alert(data.message);
+                }
+                } catch (error) {
+                console.error("Error fetching questions:", error);
+                alert('Could not load questions.');
+                }
+            }
+
+            const deleteExamButton = event.target.closest('.delete-exam');
+            if (deleteExamButton) {
+                const examId = deleteExamButton.dataset.examId;
+                if (confirm('Are you sure you want to delete this exam?')) {
+                // Implement your delete exam API call here
+                console.log(`Deleting exam: ${examId}`);
+                // After successful deletion, you'll likely want to reload the exam list
+                window.location.reload();
+                }
+            }
+            });
+        }
+
+        if (questionsSection) {
+            questionsSection.addEventListener('click', (event) => {
+            const deleteQuestionButton = event.target.closest('.delete-question');
+            if (deleteQuestionButton) {
+                const questionId = deleteQuestionButton.dataset.questionId;
+                if (confirm('Are you sure you want to delete this question?')) {
+                // Implement your delete question API call here
+                console.log(`Deleting question: ${questionId}`);
+                // After successful deletion, re-fetch and update the displayed questions
+                const currentExamTitle = document.querySelector('#questions-section h2 span.selected-exam-title')?.textContent;
+                const examItem = document.querySelector(`.exams-ul li.exam-item span.exam-title[data-exam-title="${currentExamTitle}"]`);
+                const examIdToDeleteFrom = examItem?.closest('.exam-item')?.dataset?.examId;
+
+                if (examIdToDeleteFrom) {
+                    fetch(`/teacher/exams/${examIdToDeleteFrom}/questions`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                        questionsSection.innerHTML = `
+                            <h2><i class="fas fa-question-circle"></i> Questions for: <span class="selected-exam-title">${data.selectedExam.title}</span></h2>
+                            <div class="questions-actions">
+                            <a href="/teacher/exams/${data.selectedExam._id}/questions/create" class="button create-new"><i class="fas fa-plus-circle"></i> Add New Question</a>
+                            </div>
+                            ${data.questions.length > 0 ? `
+                            <ul class="questions-ul">
+                                ${data.questions.map(question => `
+                                <li class="question-item" data-question-id="${question._id}">
+                                    <span class="question-text">${question.text.substring(0, 100)}...</span>
+                                    <div class="question-actions">
+                                    <a href="/teacher/questions/${question._id}/edit" class="button edit"><i class="fas fa-edit"></i> Edit</a>
+                                    <button class="button delete-question" data-question-id="${question._id}"><i class="fas fa-trash-alt"></i> Delete</button>
+                                    </div>
+                                </li>
+                                `).join('')}
+                            </ul>
+                            ` : '<p class="empty-message">No questions in this exam yet.</p>'}
+                        `;
+                        } else {
+                        alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error re-fetching questions:", error);
+                        alert('Could not reload questions.');
+                    });
+                } else {
+                    questionsSection.style.display = 'none';
+                    questionsSection.innerHTML = '<p class="info-message">Select an exam to view its questions.</p>';
+                }
+                }
+            }
+            });
+        }
+        });

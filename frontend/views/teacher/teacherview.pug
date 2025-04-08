@@ -6,12 +6,21 @@ block content
 
     .dashboard-summary
       .summary-card
-        h3 #{createdExamsCount || 0}
+        h3 #{createdExams.length || 0}
         p Created Exams
       .summary-card
         h3 #{totalQuestionsCount || 0}
         p Total Questions
 
+    h2 Your Created Exams
+    if createdExams && createdExams.length > 0
+      ul
+        each exam in createdExams
+          li
+            a(href="/teacher/exams/#{exam._id}/manage") #{exam.title}
+    else
+      p You haven't created any exams yet.
+    
     .recent-activity
       h2 Recent Activity
       ul
