@@ -64,15 +64,38 @@ block content
       padding: 20px;
       color: var(--text-light);
     }
+
+    .start-test-button {
+      background-color: var(--secondary-color);
+      color: var(--white);
+      border: none;
+      border-radius: var(--border-radius);
+      padding: var(--spacing-sm) var(--spacing-md);
+      font-size: var(--font-size-md);
+      cursor: pointer;
+      text-decoration: none;
+      transition: background-color 0.3s ease;
+    }
+
+    .start-test-button:hover {
+      opacity: 0.85;
+    }
   .tests-container
     .tests-header
       h1 Available Tests for #{user.name}
 
-    if tests && tests.length > 0
+    if exams && exams.length > 0
       ul.tests-list
-        each test in tests
+        each exam in exams
           li
-            a(href=test.link) #{test.name}
-            span (#{test.questionsCount} Questions)
+            div
+              a(href="#") #{exam.title}
+              span (#{exam.questionsCount} Questions)
+            a.start-test-button(href=`/student/start-test/${exam.examId}`) Start Test
     else
       p.no-tests No tests available at the moment.
+
+  script.
+    document.addEventListener('DOMContentLoaded', () => {
+      // You can add any client-side scripting here if needed
+    });
