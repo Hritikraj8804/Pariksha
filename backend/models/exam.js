@@ -6,6 +6,11 @@ const questionSchema = new mongoose.Schema({
         ref: 'Exam',
         required: true
     },
+    teacherId: { // Add this field to track the creator
+        type: Number, // Assuming your teacher IDs in 'project' are Numbers
+        ref: 'project',
+        required: true
+    },
     text: {
         type: String,
         required: true
@@ -25,13 +30,14 @@ const questionSchema = new mongoose.Schema({
 
 const examSchema = new mongoose.Schema({
     teacherId: {
-        type: Number, // Assuming your teacher IDs in the 'projectdatabase' are numbers
-        ref: 'project', // Reference to your user collection
+        type: Number, // Assuming your teacher IDs in 'project' are Numbers
+        ref: 'project',
         required: true
     },
     title: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     course: String,
     duration: {
@@ -46,11 +52,46 @@ const examSchema = new mongoose.Schema({
     },
     questions: [{
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Question' // Reference to the Question model
+        ref: 'Question'
     }]
 }, { versionKey: false });
 
-const Exam = mongoose.model('Exam', examSchema, 'exams'); // 'exams' will be the name of your new collection
-const Question = mongoose.model('Question', questionSchema, 'questions'); // 'questions' will be the name of your new collection
+const activitySchema = new mongoose.Schema({
+    teacherId: { 
+        type: Number,
+        ref: 'project', 
+        required: true 
+    },
+    description: String,
+    date: { 
+        type: Date, 
+        default: Date.now 
+    },
+}, { versionKey: false });
 
-module.exports = { Exam, Question };
+
+const resultSchema = new mongoose.Schema({
+    teacherId: { 
+        type: Number, 
+        ref: 'project', 
+        required: true 
+    },
+    examId: { 
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'Exam', 
+        required: true 
+    },
+    studentId: { 
+        type: Number, 
+        ref: 'project', 
+        required: true 
+    },
+    score: Number,
+}, { versionKey: false });
+
+const Exam = mongoose.model('Exam', examSchema, 'exams');
+const Question = mongoose.model('Question', questionSchema, 'questions');
+const Activity = mongoose.model('Activity', activitySchema, 'activities');
+const Result = mongoose.model('Result', resultSchema, 'results');
+
+module.exports = { Exam, Question, Activity, Result };
