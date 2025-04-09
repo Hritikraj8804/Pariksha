@@ -3,15 +3,6 @@ extends layout
 block content
     .view-results-container
         h1.view-results-header View Exam Results
-        .results-filter
-            label(for="exam") Select Exam:
-            select(id="exam", name="exam")
-                option(value="") All Exams
-                if results && results.length > 0
-                    - const uniqueExamTitles = [...new Set(results.map(r => r.exam.title))];
-                    each examTitle in uniqueExamTitles
-                        option(value=examTitle) #{examTitle}
-            button(onclick="filterResults()") Filter
 
         if errorMessage
             p.error-message #{errorMessage}
@@ -48,7 +39,7 @@ block content
                             //- td N/A // You might need to calculate or fetch total marks separately
                             
                             td #{result.submissionTime ? new Date(result.submissionTime).toLocaleDateString() : 'N/A'}
-                            td #{result.course}
+                            td #{result.course} 
         else
             p No results available.
 

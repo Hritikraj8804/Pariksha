@@ -10,17 +10,17 @@ block content
         ul.exams-ul
           each exam in exams
             li.exam-item(data-exam-id="#{exam._id}")
-              span.exam-title #{exam.title}
-              .exam-actions
-                a.button.edit(href="/teacher/questions/#{exam._id}/edit")
-                  i.fas.fa-edit
-                  span Edit
-                button.button.delete-exam(data-exam-id="#{exam._id}")
-                  i.fas.fa-trash-alt
-                  span Delete
-                button.button.view-questions(data-exam-id="#{exam._id}")
-                  i.fas.fa-eye
-                  span View Questions
+              .exam-header
+                span.exam-title #{exam.title}
+
+              .exam-questions(style="display: none;")
+                if exam.questions && exam.questions.length > 0
+                  ul.questions-ul
+                    each question in exam.questions
+                      li.question-item(data-question-id="#{question._id}")
+                        span.question-text #{question.text}
+                else
+                  p.empty-message No questions in this exam yet.
         a.button.create-new(href="/teacher/exams/create")
           i.fas.fa-plus-circle
           span Create New Exam
@@ -29,31 +29,6 @@ block content
         a.button.create-new(href="/teacher/exams/create")
           i.fas.fa-plus-circle
           span Create New Exam
-
-    #questions-section.questions-card(style="display: none;")
-      if selectedExam
-        h2 Questions for:
-          span.selected-exam-title #{selectedExam.title}
-        .questions-actions
-          a.button.create-new(href="/teacher/questions/#{selectedExam._id}/questions/create")
-            i.fas.fa-plus-circle
-            span Add New Question
-        if questions && questions.length > 0
-          ul.questions-ul
-            each question in questions
-              li.question-item(data-question-id="#{question._id}")
-                span.question-text #{question.text.substring(0, 100)}...
-                .question-actions
-                  a.button.edit(href="/teacher/questions/#{question._id}/edit")
-                    i.fas.fa-edit
-                    span Edit
-                  button.button.delete-question(data-question-id="#{question._id}")
-                    i.fas.fa-trash-alt
-                    span Delete
-        else
-          p.empty-message No questions in this exam yet.
-      else
-        p.info-message Select an exam to view its questions.
 
 block styles
   style.
@@ -118,9 +93,6 @@ block styles
     }
 
     .exam-item, .question-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
       padding: var(--spacing-md) 0;
       border-bottom: 1px solid var(--border-color);
     }
@@ -129,9 +101,49 @@ block styles
       border-bottom: none;
     }
 
-    .exam-title, .question-text {
+    .exam-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--spacing-md) 0;
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer; /* Indicate it's clickable */
+    }
+
+    .exam-header:last-child {
+      border-bottom: none;
+    }
+
+    .exam-header .exam-title {
       flex-grow: 1;
       margin-right: var(--spacing-md);
+    }
+
+    .exam-questions {
+      padding: var(--spacing-md);
+      background-color: #f9f9f9;
+      border-left: 1px solid var(--border-color);
+      margin-left: var(--spacing-md);
+      margin-top: var(--spacing-sm);
+      border-radius: var(--border-radius);
+    }
+
+    .exam-questions .questions-ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .exam-questions .question-item {
+      padding: var(--spacing-sm) 0;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .exam-questions .question-item:last-child {
+      border-bottom: none;
+    }
+
+    .exam-questions .question-text {
+      display: block; /* Make text take full width */
     }
 
     /* Button Styles */
@@ -155,14 +167,6 @@ block styles
       margin-right: var(--spacing-sm);
     }
 
-    .button.edit {
-      background-color: var(--primary-color);
-    }
-
-    .button.delete-exam, .button.delete-question {
-      background-color: var(--danger-color);
-    }
-
     .button.create-new {
       background-color: var(--secondary-color);
       margin-top: var(--spacing-md);
@@ -172,137 +176,9 @@ block styles
       opacity: 0.85;
     }
 
-    .exam-actions, .question-actions {
-      display: flex;
-      gap: var(--spacing-sm);
-    }
-
     /* Empty/Info Messages */
     .empty-message, .info-message {
       color: var(--text-light);
       font-style: italic;
       margin-top: var(--spacing-md);
     }
-
-    .questions-card h2 {
-      display: flex;
-      align-items: center;
-      gap: var(--spacing-sm);
-    }
-
-    .questions-card h2 .selected-exam-title {
-      color: var(--primary-color);
-      font-weight: bold;
-    }
-
-    script(src="https://kit.fontawesome.com/your-fontawesome-kit.js" crossorigin="anonymous")
-    script.
-        document.addEventListener('DOMContentLoaded', () => {
-        const examsList = document.querySelector('.exams-ul');
-        const questionsSection = document.getElementById('questions-section');
-
-        if (examsList) {
-            examsList.addEventListener('click', async (event) => {
-            const viewQuestionsButton = event.target.closest('.view-questions');
-            if (viewQuestionsButton) {
-                const examId = viewQuestionsButton.dataset.examId;
-                try {
-                const response = await fetch(`/teacher/exams/${examId}/questions`);
-                const data = await response.json();
-                if (data.success) {
-                    questionsSection.innerHTML = `
-                    <h2><i class="fas fa-question-circle"></i> Questions for: <span class="selected-exam-title">${data.selectedExam.title}</span></h2>
-                    <div class="questions-actions">
-                        <a href="/teacher/exams/${data.selectedExam._id}/questions/create" class="button create-new"><i class="fas fa-plus-circle"></i> Add New Question</a>
-                    </div>
-                    ${data.questions.length > 0 ? `
-                        <ul class="questions-ul">
-                        ${data.questions.map(question => `
-                            <li class="question-item" data-question-id="${question._id}">
-                            <span class="question-text">${question.text.substring(0, 100)}...</span>
-                            <div class="question-actions">
-                                <a href="/teacher/questions/${question._id}/edit" class="button edit"><i class="fas fa-edit"></i> Edit</a>
-                                <button class="button delete-question" data-question-id="${question._id}"><i class="fas fa-trash-alt"></i> Delete</button>
-                            </div>
-                            </li>
-                        `).join('')}
-                        </ul>
-                    ` : '<p class="empty-message">No questions in this exam yet.</p>'}
-                    `;
-                    questionsSection.style.display = 'block';
-                } else {
-                    alert(data.message);
-                }
-                } catch (error) {
-                console.error("Error fetching questions:", error);
-                alert('Could not load questions.');
-                }
-            }
-
-            const deleteExamButton = event.target.closest('.delete-exam');
-            if (deleteExamButton) {
-                const examId = deleteExamButton.dataset.examId;
-                if (confirm('Are you sure you want to delete this exam?')) {
-                // Implement your delete exam API call here
-                console.log(`Deleting exam: ${examId}`);
-                // After successful deletion, you'll likely want to reload the exam list
-                window.location.reload();
-                }
-            }
-            });
-        }
-
-        if (questionsSection) {
-            questionsSection.addEventListener('click', (event) => {
-            const deleteQuestionButton = event.target.closest('.delete-question');
-            if (deleteQuestionButton) {
-                const questionId = deleteQuestionButton.dataset.questionId;
-                if (confirm('Are you sure you want to delete this question?')) {
-                // Implement your delete question API call here
-                console.log(`Deleting question: ${questionId}`);
-                // After successful deletion, re-fetch and update the displayed questions
-                const currentExamTitle = document.querySelector('#questions-section h2 span.selected-exam-title')?.textContent;
-                const examItem = document.querySelector(`.exams-ul li.exam-item span.exam-title[data-exam-title="${currentExamTitle}"]`);
-                const examIdToDeleteFrom = examItem?.closest('.exam-item')?.dataset?.examId;
-
-                if (examIdToDeleteFrom) {
-                    fetch(`/teacher/exams/${examIdToDeleteFrom}/questions`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                        questionsSection.innerHTML = `
-                            <h2><i class="fas fa-question-circle"></i> Questions for: <span class="selected-exam-title">${data.selectedExam.title}</span></h2>
-                            <div class="questions-actions">
-                            <a href="/teacher/exams/${data.selectedExam._id}/questions/create" class="button create-new"><i class="fas fa-plus-circle"></i> Add New Question</a>
-                            </div>
-                            ${data.questions.length > 0 ? `
-                            <ul class="questions-ul">
-                                ${data.questions.map(question => `
-                                <li class="question-item" data-question-id="${question._id}">
-                                    <span class="question-text">${question.text.substring(0, 100)}...</span>
-                                    <div class="question-actions">
-                                    <a href="/teacher/questions/${question._id}/edit" class="button edit"><i class="fas fa-edit"></i> Edit</a>
-                                    <button class="button delete-question" data-question-id="${question._id}"><i class="fas fa-trash-alt"></i> Delete</button>
-                                    </div>
-                                </li>
-                                `).join('')}
-                            </ul>
-                            ` : '<p class="empty-message">No questions in this exam yet.</p>'}
-                        `;
-                        } else {
-                        alert(data.message);
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error re-fetching questions:", error);
-                        alert('Could not reload questions.');
-                    });
-                } else {
-                    questionsSection.style.display = 'none';
-                    questionsSection.innerHTML = '<p class="info-message">Select an exam to view its questions.</p>';
-                }
-                }
-            }
-            });
-        }
-        });

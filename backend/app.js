@@ -783,6 +783,32 @@ app.get('/teacher/questions/:examId/questions', async (req, res) => {
     }
 });
 
+app.get('/teacher/students', async (req, res) => {
+  if (req.session.user && req.session.user.roles.includes('teacher')) {
+    try {
+      // Fetch all users from the 'projectdatabase' collection who have the 'student' role
+      const studentsData = await csemodel.find({ roles: 'student' }); // Adjust the filter based on how you identify students
+
+      const studentsWithImages = studentsData.map(student => ({
+        _id: student._id,
+        name: student.name,
+        email: student.email,
+        profileImage: student.profileImageBase64
+          ? `data:${student.imageContentType};base64,${student.profileImageBase64}`
+          : null,
+        // Add other relevant student properties
+      }));
+
+      res.render('teacher/students', { students: studentsWithImages });
+    } catch (error) {
+      console.error("Error fetching students:", error);
+      res.status(500).send('Could not load students.');
+    }
+  } else {
+    res.redirect('/login.html');
+  }
+});
+
 app.get('/teacher/results', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('teacher')) {
         try {
@@ -834,7 +860,7 @@ app.get('/teacher/results', async (req, res) => {
     } else {
         res.redirect('/login.html');
     }
-});
+}); 
 
 app.get('/admin/dashboard', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('admin')) {
