@@ -1,7 +1,6 @@
 {
   "name": "backend",
   "version": "1.0.0",
-  "description": "",
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
@@ -23,5 +22,6 @@
     "morgan": "^1.10.0",
     "path": "^0.12.7",
     "pug": "^3.0.3"
-  }
+  },
+  "description": ""
 }

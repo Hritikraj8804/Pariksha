@@ -2,7 +2,6 @@ extends layout
 
 block content
   style.
-    /* Styles for the Student Result Page */
     .student-result-container {
       max-width: 600px;
       margin: 40px auto;
@@ -89,8 +88,13 @@ block content
       background-color: var(--secondary-color); /* Corrected syntax */
     }
 
+
   .student-result-container
     h1 Your Test Result
+
+    if profileImage
+      .profile-image
+        img(src=profileImage, alt="Your Profile Picture", width="100")
 
     if result
       .result-info
@@ -105,3 +109,6 @@ block content
       .button-container
         a.action-button.dashboard-button(href="/student/dashboard") Dashboard
         a.action-button.try-again-button(href="/student/tests") Try Again
+      p Exam Title: #{exam ? exam.title : 'Unknown Exam'}
+      p Your Score: #{result.score}
+      p Submitted At: #{result.submittedAt.toLocaleDateString()} #{result.submittedAt.toLocaleTimeString()}
