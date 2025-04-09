@@ -392,21 +392,74 @@ app.get('/student/leaderboard', async(req, res) => {
     }
 });
 
-app.get('/student/performance', async(req, res) => {
+app.get('/student/performance', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {
+        const studentId = req.session.user._id;
+
         try {
-            const user = await csemodel.findById(req.session.user._id);
+            const user = await csemodel.findById(studentId);
+            const studentScores = await StudentScore.find({ studentId: studentId })
+                .populate({
+                    path: 'examId',
+                    select: 'title course',
+                    foreignField: 'examId', // Field in the Exam model
+                    localField: 'examId'   // Field in the StudentScore model
+                });
+
+            let profileImage = null;
             if (user && user.profileImage && user.profileImage.data) {
                 const imageData = user.profileImage.data.toString('base64');
                 const imageContentType = user.profileImage.contentType;
-                res.render('student/performance', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
-            } else {
-                res.render('student/performance', { user: req.session.user, profileImage: null });
+                profileImage = `data:${imageContentType};base64,${imageData}`;
             }
+
+            // Calculate overall completion rate (you might need to define what this means)
+            const totalTestsTaken = studentScores.length;
+            const overallCompletionRate = totalTestsTaken > 0 ? 100 : 0; // Example: Assuming they've started if they have scores
+
+            // Organize subject-wise performance
+            const subjectPerformance = {};
+            studentScores.forEach(score => {
+                if (score.examId && score.examId.course) {
+                    const courseName = score.examId.course;
+                    if (!subjectPerformance[courseName]) {
+                        subjectPerformance[courseName] = { totalScore: 0, count: 0 };
+                    }
+                    subjectPerformance[courseName].totalScore += score.percentage || 0;
+                    subjectPerformance[courseName].count++;
+                }
+            });
+
+            const subjects = Object.keys(subjectPerformance).map(course => ({
+                name: course,
+                score: subjectPerformance[course].count > 0 ? (subjectPerformance[course].totalScore / subjectPerformance[course].count).toFixed(2) : 'N/A'
+            }));
+
+            // Organize recent test history
+            const testHistory = studentScores.map(score => ({
+                name: score.examId ? score.examId.title : 'Unknown Test',
+                score: score.percentage ? score.percentage.toFixed(2) : 'N/A',
+                date: score.submissionTime ? score.submissionTime.toLocaleDateString() : 'N/A'
+            }));
+
+            res.render('student/performance', {
+                user: req.session.user,
+                profileImage: profileImage,
+                performance: {
+                    overallCompletionRate: overallCompletionRate.toFixed(2),
+                    subjects: subjects,
+                    testHistory: testHistory.slice(-5).reverse() // Show the last 5 recent tests
+                }
+            });
+
         } catch (error) {
-            console.error("Error fetching user data for dashboard:", error);
-            res.render('student/performance', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
-        } 
+            console.error("Error fetching student performance data:", error);
+            res.render('student/performance', {
+                user: req.session.user,
+                profileImage: null,
+                errorMessage: 'Could not load performance data.'
+            });
+        }
     } else {
         res.redirect('/login.html');
     }
@@ -490,6 +543,8 @@ app.get('/teacher/exams/create', async (req, res) => {
         res.redirect('/login.html');
     }
 });
+
+
 app.post('/teacher/exams', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('teacher')) {
         try {
@@ -519,7 +574,8 @@ app.post('/teacher/exams', async (req, res) => {
                         teacherId: teacher_id,
                         text: questionData.text,
                         options: questionData.options,
-                        correctOption: parseInt(questionData.correctOption)
+                        correctOption: parseInt(questionData.correctOption),
+                        course: course // Add the course here
                     });
                     const savedQuestion = await newQuestion.save();
                     createdQuestions.push(savedQuestion._id);

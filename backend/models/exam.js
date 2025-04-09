@@ -70,7 +70,10 @@ const examSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
-    course: String,
+    course: {
+        type: String,
+        required: true
+    },
     duration: {
         type: Number,
         min: 15,
