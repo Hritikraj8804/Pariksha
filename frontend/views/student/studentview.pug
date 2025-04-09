@@ -5,27 +5,88 @@ block content
     .dashboard-header
       h1 #{user.name}, Dashboard
 
-      .dashboard-card
-        h2.card-title Recent Results
-        .card-content
-          ul.upcoming-tests-list#recent-results
-            if recentResults && recentResults.length > 0
-              each result in recentResults
-                li
-                  strong #{result.testName}
-                  | &nbsp;- Score: #{result.score}%
-            else
-              li No recent results available.
-          p.card-actions
-            a(href="/student/performance") View All Results
+    .dashboard-card
+      h2.card-title Results
+      .card-content
+        p.card-actions
+          a(href="/student/performance") View All Results
 
+    .dashboard-card
+      h2.card-title Profile Information
+      .card-content
+        p View and update your profile details.
+        p.card-actions
+          a(href="/student/profile/edit") Edit Profile
 
-      .dashboard-card
-        h2.card-title Profile Information
-        .card-content
-          p View and update your profile details.
-          p.card-actions
-            a(href="") Edit Profile
+block styles
+  style.
+    .dashboard-container {
+      max-width: 800px;
+      margin: 30px auto;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
 
-  script.
-    
+    .dashboard-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .dashboard-header h1 {
+      font-size: 2.5rem;
+      color: #333;
+    }
+
+    .dashboard-card {
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+
+    .card-title {
+      font-size: 1.8rem;
+      color: #555;
+      border-bottom: 2px solid #eee;
+      padding-bottom: 10px;
+      margin-bottom: 15px;
+    }
+
+    .card-content {
+      margin-bottom: 15px;
+    }
+
+    .upcoming-tests-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .upcoming-tests-list li {
+      padding: 10px 0;
+      border-bottom: 1px solid #f2f2f2;
+    }
+
+    .upcoming-tests-list li:last-child {
+      border-bottom: none;
+    }
+
+    .card-actions {
+      text-align: right;
+    }
+
+    .card-actions a {
+      display: inline-block;
+      padding: 8px 15px;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 5px;
+      font-size: 0.9rem;
+      transition: background-color 0.3s ease;
+    }
+
+    .card-actions a:hover {
+      background-color: #0056b3;
+    }
