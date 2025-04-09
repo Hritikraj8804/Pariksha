@@ -91,23 +91,26 @@ block content
       font-size: 1.1rem;
     }
   .start-exam-container
-    h1 #{exam.title}
-    if questions && questions.length > 0
-      form(action="/student/submit-test" method="post")
-        input(type="number" name="examId" value=examId, readonly=true, id="examId" hidden)
-
-        each question, index in questions
-          .question
-            h3 Question #{index + 1}: #{question.text}
-            input(type="hidden" name=`questions[${index}][questionId]` value=question.questionId)
-            .options
-              each option, optionIndex in question.options
-                div
-                  input(type="radio" name=`questions[${index}][selectedOption]` value=optionIndex required, id=`question-${question.questionId}-option-${optionIndex}`)
-                  label(for=`question-${question.questionId}-option-${optionIndex}`) #{option}
-        button(type="submit") Submit Test
-    else
-      p.no-questions No questions available for this exam.
+      h1 #{exam.title}
+      if questions && questions.length > 0
+          form(action="/student/submit-test" method="post")
+              input(type="number" name="examId" value=examId, readonly=true, id="examId" hidden)
+              if teacherId
+                  input(type="number" name="teacherId" value=teacherId, readonly=true, id="teacherId" hidden)
+              input(type="text" name="course" value=exam.course, readonly=true, id="course" hidden)
+              input(type="text" name="difficulty" value=exam.difficulty, readonly=true, id="difficulty" hidden)
+              each question, index in questions
+                  .question
+                      h3 Question #{index + 1}: #{question.text}
+                      input(type="hidden" name=`questions[${index}][questionId]` value=question.questionId)
+                      .options
+                          each option, optionIndex in question.options
+                              div
+                                  input(type="radio" name=`questions[${index}][selectedOption]` value=optionIndex required, id=`question-${question.questionId}-option-${optionIndex}`)
+                                  label(for=`question-${question.questionId}-option-${optionIndex}`) #{option}
+              button(type="submit") Submit Test
+      else
+          p.no-questions No questions available for this exam.
 
   script.
-    // You can add client-side scripting here if needed
+      // You can add client-side scripting here if needed
