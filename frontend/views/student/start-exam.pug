@@ -17,11 +17,7 @@ block content
       color: var(--primary-color);
       font-size: 2.2rem;
       text-align: center;
-<<<<<<< HEAD
-      margin-bottom: 30px;
-=======
       margin-bottom: 20px;
->>>>>>> a1487d7222f23f392ac6b468f3334f7d3502a03f
       font-weight: 600;
       border-bottom: 2px solid #f0f0f0;
       padding-bottom: 15px;
@@ -42,13 +38,8 @@ block content
     .question h3 {
       color: var(--dark-color);
       font-size: 1.1rem;
-<<<<<<< HEAD
-      margin-bottom: 15px;
-      font-weight: 500;
-=======
       font-weight: 500;
       margin-bottom: 15px;
->>>>>>> a1487d7222f23f392ac6b468f3334f7d3502a03f
     }
 
     .options {
@@ -80,16 +71,13 @@ block content
       font-size: 1rem;
       cursor: pointer;
       transition: background-color 0.2s ease-in-out;
-<<<<<<< HEAD
       display: block;
       margin: 30px auto;
-=======
       margin-top: 30px;
       width: 150px; /* Adjust width as needed */
       margin-left: auto;
       margin-right: auto;
       display: block; /* Make it a block-level element to center properly */
->>>>>>> a1487d7222f23f392ac6b468f3334f7d3502a03f
     }
 
     button[type="submit"]:hover {
@@ -104,20 +92,10 @@ block content
     }
   .start-exam-container
     h1 #{exam.title}
-<<<<<<< HEAD
-
     if questions && questions.length > 0
       form(action="/student/submit-test" method="post")
         input(type="number" name="examId" value=examId, readonly=true, id="examId" hidden)
-=======
-    //- You had examId and title repeated, I've kept title
-    //- h1 #{examId}
-    //- h1 #{exam.title}
 
-    if questions && questions.length > 0
-      form(action="/student/submit-test" method="post")
-        input(type="hidden" name="examId" value=examId, readonly=true, id="examId")
->>>>>>> a1487d7222f23f392ac6b468f3334f7d3502a03f
         each question, index in questions
           .question
             h3 Question #{index + 1}: #{question.text}
@@ -125,13 +103,8 @@ block content
             .options
               each option, optionIndex in question.options
                 div
-<<<<<<< HEAD
                   input(type="radio" name=`questions[${index}][selectedOption]` value=optionIndex required, id=`question-${question.questionId}-option-${optionIndex}`)
                   label(for=`question-${question.questionId}-option-${optionIndex}`) #{option}
-=======
-                  input(type="radio" name=`questions[${index}][selectedOption]` value=optionIndex required id=`option-${index}-${optionIndex}`)
-                  label(for=`option-${index}-${optionIndex}`) #{option}
->>>>>>> a1487d7222f23f392ac6b468f3334f7d3502a03f
         button(type="submit") Submit Test
     else
       p.no-questions No questions available for this exam.
