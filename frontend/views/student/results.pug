@@ -87,8 +87,15 @@ block content
         .dashboard-button:hover {
             background-color: var(--secondary-color); /* Corrected syntax */
         }
+        .pass {
+            color: green;
+            font-weight: bold;
+        }
 
-
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
     .student-result-container
         h1 Your Test Result
 
@@ -100,6 +107,12 @@ block content
             .result-info
                 p <strong>Exam Title:</strong> #{exam ? exam.title : 'Unknown Exam'}
                 p <strong>Your Score:</strong> <span class="score-display">#{result.score}</span>
+                p <strong>Percentage:</strong> #{result.percentage ? result.percentage.toFixed(2) : 'N/A'}%
+                p <strong>Result: </strong>
+                    if result.passed
+                        span.pass Passed
+                    else
+                        span.fail Failed (Minimum 75%)
                 p <strong>Submitted At:</strong> #{result.submissionTime ? result.submissionTime.toLocaleDateString() : 'N/A'} #{result.submissionTime ? result.submissionTime.toLocaleTimeString() : 'N/A'}
         else
             p.error-message Error: Could not retrieve your result.

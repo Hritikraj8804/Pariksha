@@ -16,15 +16,17 @@ const studentScoreSchema = new mongoose.Schema({
         ref: 'project',
         required: true
     },
-    course: { // Add the course field
+    course: {
         type: String,
         required: true
     },
     score: Number,
     submissionTime: Date,
-    submittedAnswers: [Object] // You can define a more specific schema for submitted answers if needed
+    submittedAnswers: [Object],
+    percentage: Number, // Add the percentage field
+    passed: Boolean    // Add the passed field
 }, { versionKey: false });
 
-const StudentScore = mongoose.model('StudentScore', studentScoreSchema, 'studentScores'); // Assuming your collection name is 'studentScores'
+const StudentScore = mongoose.model('StudentScore', studentScoreSchema, 'studentScores');
 
 module.exports = StudentScore;

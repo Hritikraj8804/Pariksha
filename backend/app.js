@@ -259,9 +259,9 @@ app.post('/student/submit-test', async (req, res) => {
         const examId = parseInt(req.body.examId);
         const submittedAnswers = req.body.questions;
         const submissionTime = new Date();
-        let teacherId = parseInt(req.body.teacherId); // Parse teacherId
+        let teacherId = parseInt(req.body.teacherId);
+        const course = req.body.course;
 
-        // Debugging: Log the raw teacherId received
         console.log("Raw teacherId from form:", req.body.teacherId);
         console.log("Parsed teacherId:", teacherId);
 
@@ -270,19 +270,26 @@ app.post('/student/submit-test', async (req, res) => {
             return res.status(400).json({ error: 'Invalid teacherId received.' });
         }
 
-        const course = req.body.course;
-
         try {
-            const correctQuestions = await Question.find({ examId: examId }).select('questionId correctOption');
-
+            const correctQuestions = await Question.find({ examId: examId }).select('_id questionId correctOption'); // Select _id and questionId
+            console.log('correctQuestions:', correctQuestions);
+            const totalQuestions = correctQuestions.length;
             let score = 0;
-            if (submittedAnswers && correctQuestions.length > 0) {
+
+            if (submittedAnswers && totalQuestions > 0) {
+                console.log('submittedAnswers:', submittedAnswers);
                 submittedAnswers.forEach(submittedAnswer => {
+                    // Assuming submittedAnswer.questionId is the numerical questionId
                     const correctAnswerObject = correctQuestions.find(q => q.questionId === parseInt(submittedAnswer.questionId));
                     if (correctAnswerObject && parseInt(submittedAnswer.selectedOption) === correctAnswerObject.correctOption) {
                         score++;
                     }
                 });
+
+                const percentageScore = (score / totalQuestions) * 100;
+                console.log('percentageScore:', percentageScore);
+                const passingThreshold = 75;
+                const passed = percentageScore >= passingThreshold;
 
                 const result = await StudentScore.updateOne(
                     { studentId: studentId, examId: examId, teacherId: teacherId, course: course },
@@ -290,7 +297,9 @@ app.post('/student/submit-test', async (req, res) => {
                         $set: {
                             score: score,
                             submissionTime: submissionTime,
-                            submittedAnswers: submittedAnswers
+                            submittedAnswers: submittedAnswers,
+                            percentage: percentageScore,
+                            passed: passed
                         }
                     },
                     { upsert: true }
