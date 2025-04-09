@@ -798,8 +798,15 @@ app.get('/teacher/students', async (req, res) => {
           : null,
         // Add other relevant student properties
       }));
+      const user = await csemodel.findById(req.session.user._id);
 
-      res.render('teacher/students', { students: studentsWithImages });
+      if (user && user.profileImage && user.profileImage.data) {
+        const imageData = user.profileImage.data.toString('base64');
+        const imageContentType = user.profileImage.contentType;
+        res.render('teacher/students', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}`, students: studentsWithImages });
+        } else {
+            res.render('teacher/students', { user: req.session.user, profileImage: null, students: studentsWithImages });
+        }
     } catch (error) {
       console.error("Error fetching students:", error);
       res.status(500).send('Could not load students.');

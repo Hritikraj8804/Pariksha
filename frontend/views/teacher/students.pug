@@ -7,11 +7,18 @@ block content
     .students-list-card
       h2 Students List
       if students && students.length > 0
-        ul.students-ul
-          each student in students
-            li.student-item(data-student-id="#{student._id}")
-              span.student-name #{student.name}
-              span.student-email #{student.email}
+        table.students-table
+          thead
+            tr
+              th ID
+              th Name
+              th Email
+          tbody
+            each student in students
+              tr.student-row(data-student-id="#{student._id}")
+                td.student-id #{student._id}
+                td.student-name #{student.name}
+                td.student-email #{student.email}
       else
         p.empty-message No students registered yet.
 
@@ -40,7 +47,6 @@ block styles
       font-family: sans-serif;
       background-color: var(--light-color);
       color: var(--text-color);
-      margin: 20px;
     }
 
     .manage-dashboard-container {
@@ -71,24 +77,30 @@ block styles
       margin-bottom: var(--spacing-md);
     }
 
-    .students-ul {
-      list-style: none;
-      padding: 0;
+    /* Students Table */
+    .students-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: var(--spacing-md);
     }
 
-    .student-item {
-      display: flex;
-      gap: var(--spacing-md);
-      padding: var(--spacing-md) 0;
+    .students-table th, .students-table td {
+      padding: var(--spacing-md);
       border-bottom: 1px solid var(--border-color);
+      text-align: left;
     }
 
-    .student-item:last-child {
+    .students-table th {
+      background-color: #f2f2f2;
+      font-weight: bold;
+    }
+
+    .student-row:last-child td {
       border-bottom: none;
     }
 
-    .student-name {
-      font-weight: bold;
+    .student-id {
+      font-family: monospace; /* Monospace font for IDs */
     }
 
     .empty-message {
