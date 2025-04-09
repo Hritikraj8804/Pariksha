@@ -205,24 +205,40 @@ app.get('/student/tests', async (req, res) => {
 
 app.get('/student/start-test/:examId', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {
-        const examId = parseInt(req.params.examId); // PARSE TO INTEGER
-        console.log("examId in /student/start-test:", examId); // LOG THE VALUE
+        const examId = parseInt(req.params.examId);
+        console.log("examId in /student/start-test:", examId);
 
         try {
-            const questions = await Question.find({ examId: examId }); // USE THE PARSED INTEGER
-            const exam = await Exam.findOne({ examId: examId }).select('title');
+            const questions = await Question.find({ examId: examId });
+            const exam = await Exam.findOne({ examId: examId }).select('title course teacherId difficulty');
             const user = await csemodel.findById(req.session.user._id);
-            
+
             if (!exam) {
                 return res.status(404).send('Exam not found.');
             }
 
-            if (questions.length > 0 &&user && user.profileImage && user.profileImage.data) {
+            console.log("Teacher ID found for exam:", exam.teacherId); // Log the teacherId fetched from the database
+
+            if (questions.length > 0 && user && user.profileImage && user.profileImage.data) {
                 const imageData = user.profileImage.data.toString('base64');
                 const imageContentType = user.profileImage.contentType;
-                res.render('student/start-exam', { user: req.session.user, examId : req.params.examId, exam: exam, questions: questions, profileImage: `data:${imageContentType};base64,${imageData}` });
+                res.render('student/start-exam', {
+                    user: req.session.user,
+                    examId: req.params.examId,
+                    exam: exam,
+                    questions: questions,
+                    profileImage: `data:${imageContentType};base64,${imageData}`,
+                    teacherId: exam.teacherId // Explicitly pass teacherId to the template
+                });
             } else if (questions.length > 0) {
-                res.render('student/start-exam', { user: req.session.user, examId : req.params.examId, exam: exam, questions: questions, profileImage: null }); 
+                res.render('student/start-exam', {
+                    user: req.session.user,
+                    examId: req.params.examId,
+                    exam: exam,
+                    questions: questions,
+                    profileImage: null,
+                    teacherId: exam.teacherId // Explicitly pass teacherId to the template
+                });
             } else {
                 res.send('No questions found for this exam.');
             }
@@ -235,89 +251,117 @@ app.get('/student/start-test/:examId', async (req, res) => {
     }
 });
 
-const StudentScore = require('./models/score.js'); 
+const StudentScore = require('./models/score.js');
 
 app.post('/student/submit-test', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {
-      const studentId = req.session.user._id;
-      const examId = parseInt(req.body.examId);
-      const submittedAnswers = req.body.questions;
-      const submissionTime = new Date(); // Capture submission time
-  
-      try {
-        const correctQuestions = await Question.find({ examId: examId }).select('questionId correctOption');
-  
-        let score = 0;
-        if (submittedAnswers && correctQuestions.length > 0) {
-          submittedAnswers.forEach(submittedAnswer => {
-            const correctAnswerObject = correctQuestions.find(q => q.questionId === parseInt(submittedAnswer.questionId));
-            if (correctAnswerObject && parseInt(submittedAnswer.selectedOption) === correctAnswerObject.correctOption) {
-              score++;
+        const studentId = req.session.user._id;
+        const examId = parseInt(req.body.examId);
+        const submittedAnswers = req.body.questions;
+        const submissionTime = new Date();
+        let teacherId = parseInt(req.body.teacherId); // Parse teacherId
+
+        // Debugging: Log the raw teacherId received
+        console.log("Raw teacherId from form:", req.body.teacherId);
+        console.log("Parsed teacherId:", teacherId);
+
+        if (isNaN(teacherId)) {
+            console.error("Error: Received NaN for teacherId:", req.body.teacherId);
+            return res.status(400).json({ error: 'Invalid teacherId received.' });
+        }
+
+        const course = req.body.course;
+
+        try {
+            const correctQuestions = await Question.find({ examId: examId }).select('questionId correctOption');
+
+            let score = 0;
+            if (submittedAnswers && correctQuestions.length > 0) {
+                submittedAnswers.forEach(submittedAnswer => {
+                    const correctAnswerObject = correctQuestions.find(q => q.questionId === parseInt(submittedAnswer.questionId));
+                    if (correctAnswerObject && parseInt(submittedAnswer.selectedOption) === correctAnswerObject.correctOption) {
+                        score++;
+                    }
+                });
+
+                const result = await StudentScore.updateOne(
+                    { studentId: studentId, examId: examId, teacherId: teacherId, course: course },
+                    {
+                        $set: {
+                            score: score,
+                            submissionTime: submissionTime,
+                            submittedAnswers: submittedAnswers
+                        }
+                    },
+                    { upsert: true }
+                );
+
+                let studentScoreId;
+                if (result.upsertedId) {
+                    studentScoreId = result.upsertedId._id;
+                } else {
+                    const existingScore = await StudentScore.findOne({ studentId: studentId, examId: examId, teacherId: teacherId, course: course });
+                    if (existingScore) {
+                        studentScoreId = existingScore._id;
+                    }
+                }
+
+                if (studentScoreId) {
+                    res.redirect(`/student/results/${studentScoreId}`);
+                } else {
+                    res.send('Error retrieving or creating the submission record.');
+                }
+
+            } else {
+                res.send('No submitted answers or questions found for this exam.');
             }
-          });
-  
-          // Create a new StudentScore document
-          const studentScore = new StudentScore({
-            studentId: studentId,
-            examId: examId,
-            score: score,
-            submissionTime: submissionTime, // Save the submission time
-            submittedAnswers: submittedAnswers, // Optionally save submitted answers for review
-          });
-  
-          await studentScore.save();
-  
-          res.redirect(`/student/results/${studentScore._id}`); // Redirect to a results page based on the StudentScore
-        } else {
-          res.send('No submitted answers or questions found for this exam.');
+
+        } catch (error) {
+            console.error("Error submitting test and saving/updating score:", error);
+            res.status(500).send('Error submitting the test and saving/updating the score.');
         }
-  
-      } catch (error) {
-        console.error("Error submitting test and saving score:", error);
-        res.status(500).send('Error submitting the test and saving the score.');
-      }
     } else {
-      res.redirect('/login.html');
+        res.redirect('/login.html');
     }
-  });
-  
-  app.get('/student/results/:resultId', async (req, res) => {
+});
+
+app.get('/student/results/:resultId', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {
-      const resultId = req.params.resultId;
-  
-      try {
-        const studentResult = await StudentScore.findById(resultId); // Assuming 'StudentScore' is your model
-        const user = await csemodel.findById(req.session.user._id);
-        const exam = await Exam.findOne({ examId: studentResult.examId }).select('title');
-  
-        if (!studentResult) {
-          return res.status(404).send('Result not found.');
+        const resultId = req.params.resultId;
+
+        try {
+            const studentResult = await StudentScore.findById(resultId); // Assuming 'StudentScore' is your model
+            const user = await csemodel.findById(req.session.user._id);
+            const exam = await Exam.findOne({ examId: studentResult.examId }).select('title');
+
+            if (!studentResult) {
+                return res.status(404).send('Result not found.');
+            }
+
+            let profileImage = null;
+            if (user && user.profileImage && user.profileImage.data) {
+                const imageData = user.profileImage.data.toString('base64');
+                const imageContentType = user.profileImage.contentType;
+                profileImage = `data:${imageContentType};base64,${imageData}`;
+            }
+
+            console.log("studentResult being passed to template:", studentResult); // For debugging
+
+            res.render('student/results', {
+                user: req.session.user,
+                result: studentResult,
+                exam: exam,
+                profileImage: profileImage,
+            });
+
+        } catch (error) {
+            console.error("Error fetching student result:", error);
+            res.status(500).send('Error fetching the result.');
         }
-  
-        let profileImage = null;
-        if (user && user.profileImage && user.profileImage.data) {
-          const imageData = user.profileImage.data.toString('base64');
-          const imageContentType = user.profileImage.contentType;
-          profileImage = `data:${imageContentType};base64,${imageData}`;
-        }
-  
-        console.log("studentResult being passed to template:", studentResult); // For debugging
-  
-        res.render('student/results', {
-          user: req.session.user,
-          result: studentResult,
-          exam: exam,
-          profileImage: profileImage,
-        });
-  
-      } catch (error) {
-        console.error("Error fetching student result:", error);
-        res.status(500).send('Error fetching the result.');
-      }
     } else {
-      res.redirect('/login.html');
+        res.redirect('/login.html');
     }
-  });
+});
 
 app.get('/student/leaderboard', async(req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {

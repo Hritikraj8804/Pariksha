@@ -10,6 +10,10 @@ const questionSchema = new mongoose.Schema({
         ref: 'Exam',
         required: true
     },
+    course: {
+        type: String,
+        required: true
+    },
     teacherId: {
         type: Number,
         ref: 'project',
@@ -23,6 +27,11 @@ const questionSchema = new mongoose.Schema({
         type: [String],
         required: true,
         validate: [array => array.length === 4, 'Must have exactly 4 options']
+    },
+    difficulty: {
+        type: String,
+        enum: ['easy', 'medium', 'hard'],
+        default: 'medium'
     },
     correctOption: {
         type: Number,
