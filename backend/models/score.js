@@ -6,8 +6,23 @@ const studentScoreSchema = new mongoose.Schema({
         ref: 'project',
         required: true
     },
+    name: { // Added student name
+        type: String,
+        ref: 'projectdatabase',
+        required: true
+    },
     examId: {
         type: Number,
+        ref: 'Exam',
+        required: true
+    },
+    title: { // Added exam title
+        type: String,
+        ref: 'Exam',
+        required: true
+    },
+    difficulty: { // Added exam difficulty
+        type: String,
         ref: 'Exam',
         required: true
     },
@@ -23,8 +38,8 @@ const studentScoreSchema = new mongoose.Schema({
     score: Number,
     submissionTime: Date,
     submittedAnswers: [Object],
-    percentage: Number, // Add the percentage field
-    passed: Boolean    // Add the passed field
+    percentage: Number,
+    passed: Boolean
 }, { versionKey: false });
 
 const StudentScore = mongoose.model('StudentScore', studentScoreSchema, 'studentScores');

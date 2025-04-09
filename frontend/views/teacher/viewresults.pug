@@ -24,17 +24,20 @@ block content
                         th Exam Title
                         th Score
                         th Percentage
+                        th Difficulty
                         th Status
                         //- th Total Marks // Assuming this is not directly in StudentScore
                         th Date Taken
+                        th Course
                 tbody
                     each result in results
                         tr
                             td #{result.studentId}
-                            td #{result.studentName}
-                            td #{result.exam.title}
+                            td #{result.name}
+                            td #{result.title}
                             td #{result.score !== undefined ? result.score : 'N/A'}
                             td #{result.percentage !== undefined ? result.percentage.toFixed(2) + '%' : 'N/A'}
+                            td #{result.difficulty !== undefined ? result.difficulty : 'N/A'}
                             td
                                 if result.passed === true
                                     span.pass-text Passed
@@ -43,7 +46,9 @@ block content
                                 else
                                     span N/A
                             //- td N/A // You might need to calculate or fetch total marks separately
+                            
                             td #{result.submissionTime ? new Date(result.submissionTime).toLocaleDateString() : 'N/A'}
+                            td #{result.course}
         else
             p No results available.
 

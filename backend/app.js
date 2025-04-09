@@ -211,7 +211,7 @@ app.get('/student/start-test/:examId', async (req, res) => {
         try {
             const questions = await Question.find({ examId: examId });
             const exam = await Exam.findOne({ examId: examId }).select('title course teacherId difficulty');
-            const user = await csemodel.findById(req.session.user._id);
+            const user = await csemodel.findById(req.session.user._id).select('name');
 
             if (!exam) {
                 return res.status(404).send('Exam not found.');
@@ -224,9 +224,11 @@ app.get('/student/start-test/:examId', async (req, res) => {
                 const imageContentType = user.profileImage.contentType;
                 res.render('student/start-exam', {
                     user: req.session.user,
+                    name: user.name,
                     examId: req.params.examId,
                     exam: exam,
                     questions: questions,
+                    difficulty: exam.difficulty,
                     profileImage: `data:${imageContentType};base64,${imageData}`,
                     teacherId: exam.teacherId // Explicitly pass teacherId to the template
                 });
@@ -234,8 +236,10 @@ app.get('/student/start-test/:examId', async (req, res) => {
                 res.render('student/start-exam', {
                     user: req.session.user,
                     examId: req.params.examId,
+                    name: user.name,
                     exam: exam,
                     questions: questions,
+                    difficulty: exam.difficulty,
                     profileImage: null,
                     teacherId: exam.teacherId // Explicitly pass teacherId to the template
                 });
@@ -271,7 +275,7 @@ app.post('/student/submit-test', async (req, res) => {
         }
 
         try {
-            const correctQuestions = await Question.find({ examId: examId }).select('_id questionId correctOption'); // Select _id and questionId
+            const correctQuestions = await Question.find({ examId: examId }).select('_id questionId correctOption');
             console.log('correctQuestions:', correctQuestions);
             const totalQuestions = correctQuestions.length;
             let score = 0;
@@ -279,7 +283,6 @@ app.post('/student/submit-test', async (req, res) => {
             if (submittedAnswers && totalQuestions > 0) {
                 console.log('submittedAnswers:', submittedAnswers);
                 submittedAnswers.forEach(submittedAnswer => {
-                    // Assuming submittedAnswer.questionId is the numerical questionId
                     const correctAnswerObject = correctQuestions.find(q => q.questionId === parseInt(submittedAnswer.questionId));
                     if (correctAnswerObject && parseInt(submittedAnswer.selectedOption) === correctAnswerObject.correctOption) {
                         score++;
@@ -291,10 +294,21 @@ app.post('/student/submit-test', async (req, res) => {
                 const passingThreshold = 75;
                 const passed = percentageScore >= passingThreshold;
 
+                // Fetch student name and exam details
+                const student = await csemodel.findById(studentId).select('name');
+                const exam = await Exam.findOne({ examId: examId }).select('title difficulty');
+
+                if (!student || !exam) {
+                    return res.status(404).json({ error: 'Student or Exam data not found.' });
+                }
+
                 const result = await StudentScore.updateOne(
                     { studentId: studentId, examId: examId, teacherId: teacherId, course: course },
                     {
                         $set: {
+                            name: student.name, // Save student name
+                            title: exam.title,   // Save exam title
+                            difficulty: exam.difficulty, // Save exam difficulty
                             score: score,
                             submissionTime: submissionTime,
                             submittedAnswers: submittedAnswers,
