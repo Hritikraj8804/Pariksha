@@ -769,26 +769,58 @@ app.get('/teacher/questions/:examId/questions', async (req, res) => {
     }
 });
 
-app.get('/teacher/results', async(req, res) => {
+app.get('/teacher/results', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('teacher')) {
         try {
             const user = await csemodel.findById(req.session.user._id);
+            const teacherId = req.session.user._id;
+
+            const studentScores = await StudentScore.find({ teacherId: teacherId });
+
+            // Extract unique student and exam IDs
+            const studentIds = [...new Set(studentScores.map(score => score.studentId))];
+            const examIds = [...new Set(studentScores.map(score => score.examId))];
+
+            // Fetch related student and exam data
+            const students = await csemodel.find({ studentId: { $in: studentIds } }); // Assuming 'studentId' is the field in your student model
+            const exams = await Exam.find({ examId: { $in: examIds } }).select('title'); // Assuming 'examId' is the field in your exam model
+
+            // Combine the data
+            const results = studentScores.map(score => {
+                const student = students.find(s => s.studentId === score.studentId);
+                const exam = exams.find(e => e.examId === score.examId);
+                return {
+                    ...score.toObject(), // Convert Mongoose document to plain object
+                    student: student || { name: 'Unknown Student' },
+                    exam: exam || { title: 'Unknown Exam' }
+                };
+            });
+
+            let profileImage = null;
             if (user && user.profileImage && user.profileImage.data) {
                 const imageData = user.profileImage.data.toString('base64');
                 const imageContentType = user.profileImage.contentType;
-                res.render('teacher/viewresults', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
-            } else {
-                res.render('teacher/viewresults', { user: req.session.user, profileImage: null });
+                profileImage = `data:${imageContentType};base64,${imageData}`;
             }
+
+            res.render('teacher/viewresults', {
+                user: req.session.user,
+                profileImage: profileImage,
+                results: results
+            });
+
         } catch (error) {
-            console.error("Error fetching user data for dashboard:", error);
-            res.render('teacher/viewresults', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
+            console.error("Error fetching exam results:", error);
+            res.render('teacher/viewresults', {
+                user: req.session.user,
+                profileImage: null,
+                errorMessage: 'Could not load exam results.'
+            });
         }
     } else {
         res.redirect('/login.html');
     }
 });
-
 
 app.get('/admin/dashboard', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('admin')) {
