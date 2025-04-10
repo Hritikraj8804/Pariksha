@@ -3,90 +3,217 @@ extends layout
 block content
   .dashboard-container
     .dashboard-header
-      h1 #{user.name}, Dashboard
+      .user-info
+        h1 Welcome, #{user.name}
+        p Student ID: #{user.studentId || 'N/A'}
 
-    .dashboard-card
-      h2.card-title Results
-      .card-content
-        p.card-actions
-          a(href="/student/performance") View All Results
+    .dashboard-overview
+      .overview-card.results-overview
+        h3.overview-title Your Performance
+        .overview-data
+          .data-item
+            span Total Exams Taken:
+            span.value #{performance.totalExams || 0}
+          .data-item
+            span Average Score:
+            span.value #{performance.averageScore || 'N/A'}%
+          .data-item
+            span Last Exam Score:
+            span.value #{performance.lastExamScore || 'N/A'}%
+        .overview-actions
+          a(href="/student/performance") View Detailed Results
 
-    .dashboard-card
-      h2.card-title Profile Information
-      .card-content
-        p View and update your profile details.
-        p.card-actions
+      .overview-card.profile-overview
+        h3.overview-title Profile Overview
+        .overview-data
+          .data-item
+            span Email:
+            span.value #{user.email}
+          .data-item
+            span Course:
+            span.value #{user.course || 'N/A'}
+        .overview-actions
           a(href="/student/profile/edit") Edit Profile
+
+    .dashboard-section
+      h2.section-title Remaining Tests
+      if remainingTests && remainingTests.length > 0
+        ul.upcoming-tests-list
+          each test in remainingTests
+            li
+              .test-details
+                h4 #{test.name}
+                p
+                  i.fas.fa-calendar-alt
+                  |  Starts: #{new Date(test.startDate).toLocaleDateString()}
+                p
+                  i.fas.fa-clock
+                  |  Time: #{test.startTime || 'N/A'}
+              .test-actions
+                a(href="#") View Details
+
+      else
+        p No upcoming tests scheduled.
+
+    // Add more sections like "Recent Activity", "Announcements", etc.
 
 block styles
   style.
+    /* === Dashboard Container === */
     .dashboard-container {
-      max-width: 800px;
+      max-width: 1024px; /* Wider container */
       margin: 30px auto;
-      padding: 20px;
-      background-color: #f9f9f9;
-      border-radius: 8px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+      background-color: var(--light-color);
+      border-radius: var(--border-radius);
+      box-shadow: var(--box-shadow);
     }
 
+    /* === Dashboard Header === */
     .dashboard-header {
-      text-align: center;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .dashboard-header .user-info h1 {
+      font-size: 2.2rem;
+      color: var(--dark-color);
+      margin-bottom: 5px;
+    }
+
+    .dashboard-header .user-info p {
+      color: var(--text-light);
+      font-size: 1rem;
+    }
+
+    /* === Dashboard Overview === */
+    .dashboard-overview {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
       margin-bottom: 30px;
     }
 
-    .dashboard-header h1 {
-      font-size: 2.5rem;
-      color: #333;
-    }
-
-    .dashboard-card {
-      background-color: #fff;
-      border-radius: 8px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      margin-bottom: 20px;
+    .overview-card {
+      background-color: var(--white);
+      border-radius: var(--border-radius);
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
       padding: 20px;
+      border: 1px solid #eee;
     }
 
-    .card-title {
+    .overview-title {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+
+    .overview-data {
+      margin-bottom: 15px;
+    }
+
+    .data-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 8px;
+      font-size: 1rem;
+      color: var(--text-color);
+    }
+
+    .data-item .value {
+      font-weight: 500;
+      color: var(--accent-color);
+    }
+
+    .overview-actions a {
+      display: inline-block;
+      padding: 8px 15px;
+      color: var(--primary-color);
+      text-decoration: none;
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+      border: 1px solid var(--primary-color);
+      transition: background-color 0.2s ease-in-out, color 0.2s ease-in-out;
+    }
+
+    .overview-actions a:hover {
+      background-color: rgba(var(--primary-color-rgb), 0.1);
+      color: var(--primary-color);
+    }
+
+    /* === Dashboard Sections === */
+    .dashboard-section {
+      margin-bottom: 30px;
+    }
+
+    .section-title {
       font-size: 1.8rem;
-      color: #555;
-      border-bottom: 2px solid #eee;
+      color: var(--dark-color);
+      border-bottom: 2px solid var(--accent-color);
       padding-bottom: 10px;
-      margin-bottom: 15px;
+      margin-bottom: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
 
-    .card-content {
-      margin-bottom: 15px;
+    .section-title i {
+      font-size: 1.3rem;
     }
 
+    /* === Upcoming Tests List === */
     .upcoming-tests-list {
       list-style: none;
       padding: 0;
     }
 
     .upcoming-tests-list li {
-      padding: 10px 0;
+      padding: 15px 0;
       border-bottom: 1px solid #f2f2f2;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .upcoming-tests-list li:last-child {
       border-bottom: none;
     }
 
-    .card-actions {
-      text-align: right;
+    .test-details h4 {
+      font-size: 1.1rem;
+      color: var(--dark-color);
+      margin-bottom: 5px;
     }
 
-    .card-actions a {
-      display: inline-block;
-      padding: 8px 15px;
-      color: #fff;
-      text-decoration: none;
-      border-radius: 5px;
+    .test-details p {
+      color: var(--text-light);
       font-size: 0.9rem;
-      transition: background-color 0.3s ease;
+      margin-bottom: 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
     }
 
-    .card-actions a:hover {
-      background-color: #0056b3;
+    .test-details p i {
+      color: var(--accent-color);
+    }
+
+    .test-actions a {
+      padding: 8px 15px;
+      color: var(--white);
+      text-decoration: none;
+      border-radius: var(--border-radius);
+      font-size: 0.9rem;
+      background-color: var(--primary-color);
+      transition: background-color 0.2s ease-in-out;
+    }
+
+    .test-actions a:hover {
+      background-color: var(--secondary-color);
     }
