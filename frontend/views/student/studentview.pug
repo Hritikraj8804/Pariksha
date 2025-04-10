@@ -5,7 +5,7 @@ block content
     .dashboard-header
       .user-info
         h1 Welcome, #{user.name}
-        p Student ID: #{user.studentId || 'N/A'}
+        p Student ID: #{user._id || 'N/A'}
 
     .dashboard-overview
       .overview-card.results-overview
@@ -15,45 +15,11 @@ block content
             span Total Exams Taken:
             span.value #{performance.totalExams || 0}
           .data-item
-            span Average Score:
-            span.value #{performance.averageScore || 'N/A'}%
-          .data-item
             span Last Exam Score:
-            span.value #{performance.lastExamScore || 'N/A'}%
+            span.value #{performance.lastExamScore || 'N/A'}
         .overview-actions
           a(href="/student/performance") View Detailed Results
 
-      .overview-card.profile-overview
-        h3.overview-title Profile Overview
-        .overview-data
-          .data-item
-            span Email:
-            span.value #{user.email}
-          .data-item
-            span Course:
-            span.value #{user.course || 'N/A'}
-        .overview-actions
-          a(href="/student/profile/edit") Edit Profile
-
-    .dashboard-section
-      h2.section-title Remaining Tests
-      if remainingTests && remainingTests.length > 0
-        ul.upcoming-tests-list
-          each test in remainingTests
-            li
-              .test-details
-                h4 #{test.name}
-                p
-                  i.fas.fa-calendar-alt
-                  |  Starts: #{new Date(test.startDate).toLocaleDateString()}
-                p
-                  i.fas.fa-clock
-                  |  Time: #{test.startTime || 'N/A'}
-              .test-actions
-                a(href="#") View Details
-
-      else
-        p No upcoming tests scheduled.
 
     // Add more sections like "Recent Activity", "Announcements", etc.
 

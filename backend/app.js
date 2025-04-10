@@ -138,10 +138,12 @@ app.get('/logout', (req, res) => {
 app.get('/student/dashboard', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {
         try {
-            const user = await csemodel.findById(req.session.user._id).lean(); // Use .lean() for faster, plain JavaScript objects
+            const user = await csemodel.findById(req.session.user._id).lean(); // Still fetch user details by _id
+            const studentId = req.session.user._id;
+            console.log("Student ID in /student/dashboard:", studentId);
 
             if (!user) {
-                return res.redirect('/logout'); // Or handle the case where the user is no longer found
+                return res.redirect('/logout');
             }
 
             let profileImage = null;
@@ -151,25 +153,20 @@ app.get('/student/dashboard', async (req, res) => {
                 profileImage = `data:${imageContentType};base64,${imageData}`;
             }
 
-            // Mock data for dashboard - replace with your actual data fetching logic
+            // Fetch performance data from the Result model using the numerical studentId
+            const performanceData = await Result.findOne({ studentId: studentId }).lean();
+
+
             const performance = {
-                totalExams: 15,
-                averageScore: 82,
-                lastExamScore: 95,
+                totalExams: performanceData ? performanceData.totalExamsTaken : 0,
+                lastExamScore: performanceData ? performanceData.lastExamScore : 0,
             };
 
-            const remainingTests = [
-                { name: 'Midterm Exam - Calculus', startDate: new Date('2025-04-18T09:00:00Z'), startTime: '9:00 AM' },
-                { name: 'Assignment 3 - Programming', startDate: new Date('2025-04-25T14:00:00Z'), startTime: '2:00 PM' },
-                { name: 'Quiz 2 - Physics', startDate: new Date('2025-05-02T11:00:00Z'), startTime: '11:00 AM' },
-            ];
-
             res.render('student/studentview', {
-                user: req.session.user, // Pass the session user data
+                user: req.session.user,
                 profileImage: profileImage,
                 performance: performance,
-                remainingTests: remainingTests,
-                errorMessage: null, // Ensure errorMessage is always passed
+                errorMessage: null,
             });
 
         } catch (error) {
@@ -177,8 +174,7 @@ app.get('/student/dashboard', async (req, res) => {
             res.render('student/studentview', {
                 user: req.session.user,
                 profileImage: null,
-                performance: null,
-                remainingTests: null,
+                performance: { totalExams: 0, lastExamScore: 0},
                 errorMessage: 'Could not load dashboard information.',
             });
         }
@@ -186,7 +182,6 @@ app.get('/student/dashboard', async (req, res) => {
         res.redirect('/login.html');
     }
 });
-
 app.get('/student/tests', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {
         try {
