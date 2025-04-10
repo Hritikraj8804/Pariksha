@@ -5,133 +5,202 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Exam Portal - Home</title>
     <link rel="stylesheet" href="./styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" integrity="sha512-Fo3rlrZj/k7ujTnHg4CGR2D7kSs0v4LLanw2qksYuRlEzO+tcaEPQogQ0KaoGN26/zrn20ImR1DfuLWnOo7aBA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 <body>
-    <!-- Navigation Bar -->
     <nav class="navbar">
         <div class="nav-container">
-          <a href="/" class="logo">ExamPortal</a>
-          
-          <div class="menu-toggle" id="mobile-menu">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-          
-          <div class="nav-links" id="nav-links">
-            <a href="">About</a>
-            <a href="">Contact</a>
-            <div class="auth-links">
-              <a href="./login.html" class="btn btn-primary">Login</a>
-              <a href="./register.html" class="btn btn-primary">Register</a>
-            </div>
-          </div>
-        </div>
-      </nav>
+            <a href="/home" class="logo"><i class="fas fa-graduation-cap"></i> Pariksha</a>
 
-    <!-- Hero Section -->
+            <div class="menu-toggle" id="mobile-menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="nav-links" id="nav-links">
+                <a href="#about"><i class="fas fa-info-circle"></i> About</a>
+                <a href="#contact"><i class="fas fa-envelope"></i> Contact</a>
+                <div class="auth-links">
+                    <a href="./login.html" class="btn btn-primary"><i class="fas fa-sign-in-alt"></i> Login</a>
+                    <a href="./register.html" class="btn btn-primary"><i class="fas fa-user-plus"></i> Register</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
     <header class="hero">
         <div class="container">
-            <h1>Your Gateway to Seamless Examinations</h1>
-            <p>Practice, Assess, and Excel with our comprehensive testing platform</p>
+            <h1>Level Up Your Learning with Our Exams</h1>
+            <p>Engage in challenging tests, track your progress, and achieve your academic goals.</p>
             <div class="cta-buttons">
-                <a href="./register.html" class="btn btn-outline">
-                  <span class="btn-text">Get Started</span>
-                  <span class="btn-icon">→</span>
+                <a href="./register.html" class="btn btn-primary">
+                    <span class="btn-text">Join Now</span>
+                    <span class="btn-icon"><i class="fas fa-arrow-right"></i></span>
                 </a>
-                <a href="#features" class="btn btn-outline">
-                  <span class="btn-text">Learn More</span>
+                <a href="#features" class="btn btn-primary">
+                    <span class="btn-text">Explore Features</span>
                 </a>
-              </div>
+            </div>
         </div>
     </header>
 
-    <!-- Features Section -->
     <section id="features" class="features">
         <div class="container">
-            <h2>Key Features</h2>
+            <h2><i class="fas fa-rocket"></i> Key Features</h2>
             <div class="feature-grid">
                 <div class="feature-card">
-                    <div class="feature-icon">⏱️</div>
+                    <div class="feature-icon"><i class="fas fa-stopwatch"></i></div>
                     <h3>Timed Exams</h3>
-                    <p>Real-time countdown with auto-submission</p>
+                    <p>Stay focused with real-time countdowns and automatic submission.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">📊</div>
-                    <h3>Instant Results</h3>
-                    <p>Detailed score breakdowns with analytics</p>
+                    <div class="feature-icon"><i class="fas fa-chart-bar"></i></div>
+                    <h3>Detailed Analytics</h3>
+                    <p>Get insights into your performance with comprehensive score reports.</p>
                 </div>
                 <div class="feature-card">
-                    <div class="feature-icon">🔄</div>
-                    <h3>Retake Tests</h3>
-                    <p>Multiple attempts with question randomization</p>
+                    <div class="feature-icon"><i class="fas fa-random"></i></div>
+                    <h3>Randomized Questions</h3>
+                    <p>Challenge yourself with unique question order in every attempt.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-redo"></i></div>
+                    <h3>Multiple Attempts</h3>
+                    <p>Reinforce your learning by retaking tests to improve your score.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-lock"></i></div>
+                    <h3>Secure Testing</h3>
+                    <p>Our platform ensures a fair and secure examination environment.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="fas fa-mobile-alt"></i></div>
+                    <h3>Mobile Responsive</h3>
+                    <p>Access your exams and results on any device, anytime, anywhere.</p>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Testimonials -->
-    <section class="testimonials">
-        <div class="container">
-            <h2>Trusted by Educators Worldwide</h2>
-            <div class="testimonial-slider">
-                <!-- Testimonial cards would go here -->
-            </div>
-        </div>
-    </section>
-
-    <!-- Upcoming Tests (Dynamic Section) -->
     <section class="upcoming-tests">
         <div class="container">
-            <h2>Upcoming Tests</h2>
+            <h2><i class="fas fa-calendar-alt"></i> Upcoming Tests</h2>
             <div class="test-grid" id="testContainer">
-                <!-- Tests loaded via JavaScript -->
-                <!-- <div class="test-card">
-                    <h3>Mathematics Midterm</h3>
-                    <p>Starts: May 15, 2024</p>
-                    <p>Duration: 90 minutes</p>
-                    <a href="" class="btn btn-small">View Details</a>
-                </div> -->
+                <div class="test-card">
+                    <h3>Introduction to Programming</h3>
+                    <p><i class="fas fa-calendar"></i> Starts: April 15, 2025</p>
+                    <p><i class="fas fa-clock"></i> Duration: 60 minutes</p>
+                    <p><i class="fas fa-question-circle"></i> Questions: 25</p>
+                    <a href="" class="btn btn-small"><i class="fas fa-eye"></i> View Details</a>
+                </div>
+                <div class="test-card">
+                    <h3>Advanced Mathematics</h3>
+                    <p><i class="fas fa-calendar"></i> Starts: April 22, 2025</p>
+                    <p><i class="fas fa-clock"></i> Duration: 90 minutes</p>
+                    <p><i class="fas fa-question-circle"></i> Questions: 40</p>
+                    <a href="" class="btn btn-small"><i class="fas fa-eye"></i> View Details</a>
+                </div>
+                <div class="test-card">
+                    <h3>Database Management Systems</h3>
+                    <p><i class="fas fa-calendar"></i> Starts: April 29, 2025</p>
+                    <p><i class="fas fa-clock"></i> Duration: 75 minutes</p>
+                    <p><i class="fas fa-question-circle"></i> Questions: 30</p>
+                    <a href="" class="btn btn-small"><i class="fas fa-eye"></i> View Details</a>
+                </div>
+                <div class="test-card">
+                    <h3>Web Development Fundamentals</h3>
+                    <p><i class="fas fa-calendar"></i> Starts: May 06, 2025</p>
+                    <p><i class="fas fa-clock"></i> Duration: 120 minutes</p>
+                    <p><i class="fas fa-question-circle"></i> Questions: 50</p>
+                    <a href="" class="btn btn-small"><i class="fas fa-eye"></i> View Details</a>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Footer -->
+    <section class="testimonials">
+        <div class="container">
+            <h2><i class="fas fa-comments"></i> What Our Students Say</h2>
+            <div class="testimonial-slider">
+                <div class="testimonial-card">
+                    <p><i class="fas fa-quote-left"></i> This platform has significantly improved my understanding. The timed exams help me manage my time effectively. <i class="fas fa-quote-right"></i></p>
+                    <p class="testimonial-author">- Aisha Khan, Student</p>
+                </div>
+                <div class="testimonial-card">
+                    <p><i class="fas fa-quote-left"></i> The detailed analytics provided after each test are invaluable for identifying my weak areas. Highly recommended! <i class="fas fa-quote-right"></i></p>
+                    <p class="testimonial-author">- Rohan Sharma, Learner</p>
+                </div>
+                </div>
+        </div>
+    </section>
+
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2><i class="fas fa-envelope"></i> Contact Us</h2>
+            <p>Have questions or feedback? Reach out to our team.</p>
+            <div class="contact-form">
+                <input type="text" placeholder="Your Name">
+                <input type="email" placeholder="Your Email">
+                <textarea placeholder="Your Message"></textarea>
+                <button class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send Message</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <div class="container">
+            <h2><i class="fas fa-info-circle"></i> About Pariksha</h2>
+            <p>At Pariksha, our mission is to revolutionize the way students prepare for and take exams. We believe in providing a comprehensive, user-friendly, and engaging platform that empowers learners to achieve their full potential.</p>
+            <p>Founded in 2025, Pariksha was born out of a passion for education and a vision to leverage technology to make learning assessment more accessible and effective. We understand the challenges students face in their academic journeys, and we are committed to providing the tools and resources they need to succeed.</p>
+            <p>Our platform offers a wide range of features designed to enhance the learning experience, including timed exams to build time management skills, detailed analytics to track progress and identify areas for improvement, randomized questions for a unique challenge every time, and the flexibility of multiple attempts to reinforce learning.</p>
+            <p>We are constantly striving to improve our platform and provide the best possible experience for our users. Our team is dedicated to innovation, quality, and customer satisfaction. Join the Pariksha community today and take the next step in your academic journey!</p>
+            </div>
+    </section>
+
     <footer class="footer">
         <div class="container">
             <div class="footer-grid">
                 <div class="footer-col">
-                    <h3>ExamPortal</h3>
-                    <p>Empowering educators and students through technology</p>
+                    <h3><i class="fas fa-graduation-cap"></i> Pariksha</h3>
+                    <p>Empowering educators and students through innovative assessment solutions.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                    </div>
                 </div>
                 <div class="footer-col">
                     <h4>Quick Links</h4>
                     <ul>
-                        <li><a href="home.html">Home</a></li>
-                        <li><a href="">About Us</a></li>
-                        <li><a href="">Contact</a></li>
+                        <li><a href="home.html"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="#about"><i class="fas fa-info-circle"></i> About Us</a></li>
+                        <li><a href="#features"><i class="fas fa-star"></i> Features</a></li>
+                        <li><a href="#contact"><i class="fas fa-envelope"></i> Contact</a></li>
                     </ul>
                 </div>
                 <div class="footer-col">
                     <h4>Legal</h4>
                     <ul>
-                        <li><a href="">Privacy Policy</a></li>
-                        <li><a href="">Terms of Service</a></li>
+                        <li><a href="#"><i class="fas fa-shield-alt"></i> Privacy Policy</a></li>
+                        <li><a href="#"><i class="fas fa-file-contract"></i> Terms of Service</a></li>
                     </ul>
                 </div>
             </div>
             <div class="copyright">
-                <p>&copy; 2025 ExamPortal. All rights reserved.</p>
+                <p>&copy; 2025 Pariksha. All rights reserved.</p>
             </div>
         </div>
     </footer>
     <script>
         document.getElementById('mobile-menu').addEventListener('click', function() {
-        this.classList.toggle('active');
-        document.getElementById('nav-links').classList.toggle('active');
+            this.classList.toggle('active');
+            document.getElementById('nav-links').classList.toggle('active');
         });
-    </script>
 
+        // You could fetch upcoming tests dynamically using JavaScript here
+        // For now, the dummy data is directly in the HTML
+    </script>
 </body>
 </html>
-
