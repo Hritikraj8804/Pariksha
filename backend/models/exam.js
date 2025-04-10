@@ -142,12 +142,28 @@ const resultSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
-    overallPercentage: {
+    totalExamsTaken: {
         type: Number,
         default: 0
-    }
+    },
+    lastExamScore: {
+        type: Number,
+        default: 0
+    },
+    lastExamDate: {
+        type: Date
+    },
+    lastSubmissionTime: {
+        type: Date
+    },
+    lastExamId: {
+        type: Number
+    },
+    examsGiven: [{ // Array to store IDs of exams taken
+        examId: Number,
+        examName: String // Optional: Store the name directly for efficiency
+    }]
 }, { versionKey: false });
-
 
 const Exam = mongoose.model('Exam', examSchema, 'exams');
 const Question = mongoose.model('Question', questionSchema, 'questions');

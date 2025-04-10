@@ -307,22 +307,10 @@ app.post('/student/submit-test', async (req, res) => {
         }
 
         try {
-            const correctQuestions = await Question.find({ examId: examId }).select('_id questionId correctOption');
+            const correctQuestions = await Question.find({ examId: examId }).select('_id questionId correctOption').lean();
             console.log('correctQuestions:', correctQuestions);
             const totalQuestions = correctQuestions.length;
             let score = 0;
-
-            await Result.findOneAndUpdate(
-                { studentId: studentId },
-                {
-                    $inc: { totalScore: score, totalTests: 1 },
-                    // Recalculate overall percentage (more accurate than just incrementing)
-                    $set: {
-                        overallPercentage: await calculateOverallPercentage(studentId)
-                    }
-                },
-                { upsert: true }
-            );
 
             if (submittedAnswers && totalQuestions > 0) {
                 console.log('submittedAnswers:', submittedAnswers);
@@ -339,14 +327,14 @@ app.post('/student/submit-test', async (req, res) => {
                 const passed = percentageScore >= passingThreshold;
 
                 // Fetch student name and exam details
-                const student = await csemodel.findById(studentId).select('name');
-                const exam = await Exam.findOne({ examId: examId }).select('title difficulty');
+                const student = await csemodel.findById(studentId).select('name').lean();
+                const exam = await Exam.findOne({ examId: examId }).select('title difficulty questionCount').lean(); // Fetch questionCount
 
                 if (!student || !exam) {
                     return res.status(404).json({ error: 'Student or Exam data not found.' });
                 }
 
-                const result = await StudentScore.updateOne(
+                const studentScoreRecord = await StudentScore.findOneAndUpdate(
                     { studentId: studentId, examId: examId, teacherId: teacherId, course: course },
                     {
                         $set: {
@@ -360,21 +348,37 @@ app.post('/student/submit-test', async (req, res) => {
                             passed: passed
                         }
                     },
-                    { upsert: true }
+                    { upsert: true, new: true } // Return the new or updated document
                 );
 
-                let studentScoreId;
-                if (result.upsertedId) {
-                    studentScoreId = result.upsertedId._id;
-                } else {
-                    const existingScore = await StudentScore.findOne({ studentId: studentId, examId: examId, teacherId: teacherId, course: course });
-                    if (existingScore) {
-                        studentScoreId = existingScore._id;
-                    }
-                }
+                // Update overall performance in the Result model by recalculating
+                const resultUpdate = await Result.findOneAndUpdate(
+                    { studentId: studentId },
+                    {
+                        $set: {
+                            overallPercentage: await calculateCorrectOverallPercentage(studentId),
+                            averageScore: await calculateAverageScore(studentId),
+                            lastExamScore: score,
+                            lastSubmissionTime: submissionTime,
+                            lastExamId: examId
+                        },
+                        $push: {
+                            examsGiven: {
+                                examId: examId,
+                                examName: exam ? exam.title : 'Unknown Exam',
+                                scoreObtained: score,
+                                totalPossible: exam ? exam.questionCount : totalQuestions // Use fetched questionCount
+                            }
+                        }
+                    },
+                    { upsert: true, new: true }
+                );
 
-                if (studentScoreId) {
-                    res.redirect(`/student/results/${studentScoreId}`);
+                console.log('Student Score Record:', studentScoreRecord);
+                console.log('Result Record Updated:', resultUpdate);
+
+                if (studentScoreRecord && studentScoreRecord._id) {
+                    res.redirect(`/student/results/${studentScoreRecord._id}`);
                 } else {
                     res.send('Error retrieving or creating the submission record.');
                 }
@@ -386,22 +390,49 @@ app.post('/student/submit-test', async (req, res) => {
         } catch (error) {
             console.error("Error submitting test and saving/updating score:", error);
             res.status(500).send('Error submitting the test and saving/updating the score.');
-            console.error("Error submitting test and updating total score:", error);
-            res.status(500).send('Error submitting the test and updating the total score.');
         }
     } else {
         res.redirect('/login.html');
     }
 });
 
-async function calculateOverallPercentage(studentId) {
-    const results = await Result.find({ studentId: studentId });
-    if (results.length === 0) {
+async function calculateCorrectOverallPercentage(studentId) {
+    const studentScores = await StudentScore.find({ studentId: studentId }).lean();
+    if (studentScores.length === 0) {
         return 0;
     }
-    const totalPercentageSum = results.reduce((sum, result) => sum + (result.percentage || 0), 0);
-    return parseFloat((totalPercentageSum / results.length).toFixed(2));
+
+    let totalScoreSum = 0;
+    let totalPossibleSum = 0;
+
+    for (const scoreRecord of studentScores) {
+        const examDetails = await Exam.findOne({ examId: scoreRecord.examId }).select('questionCount').lean(); // Assuming 'questionCount' in Exam model
+        if (examDetails && examDetails.questionCount !== undefined) {
+            totalScoreSum += scoreRecord.score;
+            totalPossibleSum += examDetails.questionCount; // Use questionCount as total possible
+        } else {
+            // Handle case where exam details or questionCount is missing
+            console.warn(`Could not find questionCount for examId: ${scoreRecord.examId}`);
+            // You might choose to skip this record or handle it differently
+        }
+    }
+
+    if (totalPossibleSum === 0) {
+        return 0;
+    }
+
+    return parseFloat(((totalScoreSum / totalPossibleSum) * 100).toFixed(2));
 }
+
+async function calculateAverageScore(studentId) {
+    const studentScores = await StudentScore.find({ studentId: studentId }).select('score').lean();
+    if (studentScores.length === 0) {
+        return 0;
+    }
+    const sumOfScores = studentScores.reduce((sum, record) => sum + record.score, 0);
+    return parseFloat((sumOfScores / studentScores.length).toFixed(2));
+}
+
 
 app.get('/student/results/:resultId', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {
