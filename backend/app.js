@@ -243,7 +243,7 @@ app.get('/student/start-test/:examId', async (req, res) => {
         try {
             const questions = await Question.find({ examId: examId });
             const exam = await Exam.findOne({ examId: examId }).select('title course teacherId difficulty');
-            const user = await csemodel.findById(req.session.user._id).select('name');
+            const user = await csemodel.findById(req.session.user._id);
 
             if (!exam) {
                 return res.status(404).send('Exam not found.');
@@ -355,9 +355,8 @@ app.post('/student/submit-test', async (req, res) => {
                 const resultUpdate = await Result.findOneAndUpdate(
                     { studentId: studentId },
                     {
+                        $inc: { totalScore: score, totalTests: 1, totalExamsTaken: 1 }, // Re-introduce increment
                         $set: {
-                            overallPercentage: await calculateCorrectOverallPercentage(studentId),
-                            averageScore: await calculateAverageScore(studentId),
                             lastExamScore: score,
                             lastSubmissionTime: submissionTime,
                             lastExamId: examId
@@ -367,7 +366,7 @@ app.post('/student/submit-test', async (req, res) => {
                                 examId: examId,
                                 examName: exam ? exam.title : 'Unknown Exam',
                                 scoreObtained: score,
-                                totalPossible: exam ? exam.questionCount : totalQuestions // Use fetched questionCount
+                                totalPossible: exam ? exam.questionCount : totalQuestions
                             }
                         }
                     },
@@ -396,42 +395,6 @@ app.post('/student/submit-test', async (req, res) => {
     }
 });
 
-async function calculateCorrectOverallPercentage(studentId) {
-    const studentScores = await StudentScore.find({ studentId: studentId }).lean();
-    if (studentScores.length === 0) {
-        return 0;
-    }
-
-    let totalScoreSum = 0;
-    let totalPossibleSum = 0;
-
-    for (const scoreRecord of studentScores) {
-        const examDetails = await Exam.findOne({ examId: scoreRecord.examId }).select('questionCount').lean(); // Assuming 'questionCount' in Exam model
-        if (examDetails && examDetails.questionCount !== undefined) {
-            totalScoreSum += scoreRecord.score;
-            totalPossibleSum += examDetails.questionCount; // Use questionCount as total possible
-        } else {
-            // Handle case where exam details or questionCount is missing
-            console.warn(`Could not find questionCount for examId: ${scoreRecord.examId}`);
-            // You might choose to skip this record or handle it differently
-        }
-    }
-
-    if (totalPossibleSum === 0) {
-        return 0;
-    }
-
-    return parseFloat(((totalScoreSum / totalPossibleSum) * 100).toFixed(2));
-}
-
-async function calculateAverageScore(studentId) {
-    const studentScores = await StudentScore.find({ studentId: studentId }).select('score').lean();
-    if (studentScores.length === 0) {
-        return 0;
-    }
-    const sumOfScores = studentScores.reduce((sum, record) => sum + record.score, 0);
-    return parseFloat((sumOfScores / studentScores.length).toFixed(2));
-}
 
 
 app.get('/student/results/:resultId', async (req, res) => {
@@ -478,8 +441,9 @@ app.get('/student/leaderboard', async (req, res) => {
             const user = await csemodel.findById(req.session.user._id);
 
             const leaderboardData = await Result.find({})
-                .sort({ overallPercentage: -1 })
-                .populate('studentId', 'name'); // Populate to get the student's name
+                .sort({ totalScore: -1 }) // Sort by total score instead of overallPercentage
+                .populate('studentId', 'name')
+                .select('studentId totalScore totalTests'); // Select only necessary fields
 
             let profileImageBase64 = null;
             let imageContentType = null;
