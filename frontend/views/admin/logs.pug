@@ -1,0 +1,40 @@
+extends layout
+
+block content
+  .dashboard-container
+    .dashboard-header
+      h1 System Logs
+
+    if error
+      p.error-message #{error}
+    else if logs && logs.length > 0
+      .log-viewer
+        pre
+          each line in logs
+            span.log-line #{line}
+    else
+      p No logs available.
+
+block style
+  style.
+    .log-viewer {
+      background-color: #f4f4f4;
+      border: 1px solid #ddd;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-y: auto;
+      max-height: 500px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      white-space: pre-wrap; /* Preserve formatting and wrap lines */
+    }
+
+    .log-line {
+      display: block; /* Each log entry on a new line */
+      margin-bottom: 5px;
+    }
+
+    .error-message {
+      color: red;
+      margin-top: 10px;
+    }

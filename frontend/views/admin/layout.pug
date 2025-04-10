@@ -1,0 +1,296 @@
+doctype html
+html(lang="en")
+  head
+    meta(charset="UTF-8")
+    meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    title Exam Portal
+    link(rel='stylesheet', href='/styles.css')
+    block style 
+    style.
+      /* Basic navigation styles */
+      .navbar {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 15px 0;
+      }
+
+      .nav-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        text-decoration: none;
+        color: white;
+      }
+
+      .menu-toggle {
+        display: none;
+        flex-direction: column;
+        cursor: pointer;
+      }
+
+      .menu-toggle span {
+        height: 2px;
+        width: 25px;
+        background-color: white;
+        margin-bottom: 4px;
+        border-radius: 2px;
+      }
+
+      .nav-links {
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-links a {
+        color: white;
+        text-decoration: none;
+        margin-left: 20px;
+      }
+
+      .nav-links .auth-links {
+        display: flex;
+        align-items: center;
+      }
+
+      .nav-links .auth-links .user-info {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        margin-left: 20px;
+      }
+
+      .nav-links .auth-links .user-avatar {
+        width: 35px;
+        height: 35px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 0.9rem;
+        font-weight: bold;
+        overflow: hidden;
+      }
+
+      .nav-links .auth-links .user-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .nav-links .auth-links a.btn-outline {
+        color: white;
+        border: 1px solid white;
+        padding: 8px 12px;
+        border-radius: 5px;
+        margin-left: 15px;
+      }
+
+      .nav-links .auth-links a.btn-outline:hover {
+        background-color: white;
+        color: var(--primary-color);
+      }
+
+      /* Basic footer styles */
+      .footer {
+        background-color: var(--dark-color);
+        color: white;
+        padding: 30px 0;
+        text-align: center;
+      }
+
+      .footer .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+      }
+
+      .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 20px;
+        text-align: left;
+      }
+
+      .footer-col h3, .footer-col h4 {
+        margin-bottom: 10px;
+        color: #eee;
+      }
+
+      .footer-col p {
+        color: #ccc;
+        line-height: 1.6;
+      }
+
+      .footer-col ul {
+        list-style: none;
+        padding: 0;
+      }
+
+      .footer-col ul li {
+        margin-bottom: 8px;
+      }
+
+      .footer-col ul li a {
+        color: #ccc;
+        text-decoration: none;
+        transition: color 0.3s ease;
+      }
+
+      .footer-col ul li a:hover {
+        color: white;
+      }
+
+      .copyright {
+        font-size: 0.9rem;
+        color: #aaa;
+        margin-top: 20px;
+      }
+
+      /* Mobile styles */
+      @media (max-width: 768px) {
+        .nav-links {
+          display: none;
+          flex-direction: column;
+          position: absolute;
+          background-color: var(--primary-color);
+          width: 100%;
+          top: 60px; /* Adjust based on your navbar height */
+          left: 0;
+          text-align: center;
+          z-index: 10;
+        }
+
+        .nav-links.active {
+          display: flex;
+        }
+
+        .nav-links a {
+          margin: 15px 0;
+          margin-left: 0;
+        }
+
+        .nav-links .auth-links {
+          flex-direction: column;
+          margin-left: 0;
+        }
+
+        .nav-links .auth-links .user-info {
+          margin-left: 0;
+          margin-bottom: 10px;
+        }
+
+        .nav-links .auth-links a.btn-outline {
+          margin-left: 0;
+        }
+
+        .menu-toggle {
+          display: flex;
+        }
+      }
+  body
+    nav.navbar
+      .nav-container
+        a.logo(href="/") Pariksha
+
+        .menu-toggle#mobile-menu
+          span
+          span
+          span
+
+        .nav-links#nav-links
+          if user && user.roles.includes('admin')
+            a(href="/admin/dashboard") Dashboard
+            a(href="/admin/manage-users") Manage Users
+            a(href="/admin/manage-exams") Manage Exams
+            a(href="/admin/analytics") Analytics
+            a(href="/admin/logs") Logs
+          else if user && user.roles.includes('student')
+            a(href="/student/dashboard") Dashboard
+            // Add other student-specific links here
+          .auth-links
+            if user
+              .user-info
+                .user-avatar#user-initials
+                  if profileImage
+                    img(src=profileImage, alt="Profile Image")
+                  else
+                    span#user-initials-text
+                span#user-name #{user.name}
+                a.btn.btn-outline(href="/logout") Logout
+            else
+              a(href="/login.html") Login
+              a(href="/register.html") Register
+
+    block content
+
+    footer.footer
+      .container
+        .footer-grid
+          .footer-col
+            h3 Pariksha
+            p Empowering educators and students through technology
+          .footer-col
+            h4 Quick Links
+            ul
+              if user && user.roles.includes('admin')
+                li
+                  a(href="/admin/dashboard") Dashboard
+                li
+                  a(href="/admin/manage-users") Manage Users
+                li
+                  a(href="/admin/manage-exams") Manage Exams
+                li
+                  a(href="/admin/analytics") Analytics
+              else if user && user.roles.includes('student')
+                li
+                  a(href="/student/dashboard") Dashboard
+                // Add other student-specific links here
+              li
+                a(href="/privacy-policy") Privacy Policy
+              li
+                a(href="/terms-of-service") Terms of Service
+          .footer-col
+            h4 Contact
+            p Email: info@pariksha.com
+            p Phone: +91 9876543210
+        .copyright
+          p &copy; 2025 Pariksha. All rights reserved.
+
+    script.
+      document.getElementById('mobile-menu').addEventListener('click', function() {
+        this.classList.toggle('active');
+        document.getElementById('nav-links').classList.toggle('active');
+      });
+
+      document.addEventListener('DOMContentLoaded', function() {
+        const userNamePlaceholder = document.getElementById('user-name');
+        const userAvatar = document.getElementById('user-initials');
+
+        const userName = userNamePlaceholder ? userNamePlaceholder.textContent.trim() : '';
+
+        if (userName && userAvatar) {
+          const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
+          const userInitialsText = userAvatar.querySelector('#user-initials-text');
+          const userImage = userAvatar.querySelector('img');
+
+          if (userInitialsText) userInitialsText.textContent = initials;
+          if (profileImage) {
+            if (userInitialsText) userInitialsText.style.display = 'none';
+            if (userImage) userImage.style.display = 'block';
+          } else {
+            if (userInitialsText) userInitialsText.style.display = 'flex';
+            if (userImage) userImage.style.display = 'none';
+          }
+        }
+      });

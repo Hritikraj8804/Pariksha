@@ -1,255 +1,150 @@
-<!DOCTYPE html>
-html(lang="en")
-  head
-    meta(charset="UTF-8")
-    meta(name="viewport", content="width=device-width, initial-scale=1.0")
-    title Exam Portal - Admin Dashboard
-    link(rel='stylesheet', href='/styles.css')
-    style.
-      /* Specific styles for the admin dashboard */
-      .dashboard-container {
-        max-width: 1200px;
-        margin: 80px auto;
-        padding: 20px;
-      }
+extend layout
 
-      .dashboard-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 30px;
-        padding-bottom: 20px;
-        border-bottom: 1px solid #eee;
-      }
+block content
+  .dashboard-container
+    .dashboard-header
+      h1#dashboard-user-name #{user.name} Dashboard
 
-      .dashboard-header h1 {
-        font-size: 2rem;
-        color: var(--dark-color);
-      }
-
-      .user-info {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-      }
-
-      .user-avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        background-color: var(--primary-color);
-        color: white;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        font-size: 1.2rem;
-        font-weight: bold;
-        overflow: hidden; /* To contain the image within the circle */
-      }
-
-      .user-avatar img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover; /* Ensure the image fills the circle without distortion */
-      }
-
-      .dashboard-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-        gap: 20px;
-      }
-
-      .dashboard-card {
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
-        padding: 20px;
-        transition: transform 0.3s ease;
-        border: 1px solid #eee;
-      }
-
-      .dashboard-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
-      }
-
-      .card-title {
-        font-size: 1.3rem;
-        color: var(--dark-color);
-        margin-bottom: 10px;
-      }
-
-      .card-content p {
-        color: var(--text-light);
-        margin-bottom: 15px;
-      }
-
-      .card-actions a {
-        display: inline-block;
-        padding: 8px 15px;
-        border-radius: 5px;
-        text-decoration: none;
-        color: var(--primary-color);
-        border: 1px solid var(--primary-color);
-        transition: background-color 0.3s ease, color 0.3s ease;
-      }
-
-      .card-actions a:hover {
-        background-color: var(--primary-color);
-        color: white;
-      }
-
-      .user-management-list {
-        list-style: none;
-        padding: 0;
-      }
-
-      .user-management-list li {
-        padding: 10px 0;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-      }
-
-      .user-management-list li:last-child {
-        border-bottom: none;
-      }
-
-      .user-management-list li strong {
-        color: var(--dark-color);
-      }
-  body
-    nav.navbar
-      .nav-container
-        a.logo(href="/") Pariksha
-
-        .menu-toggle#mobile-menu
-          span
-          span
-          span
-
-        .nav-links#nav-links
-          a(href="") Dashboard
-          a(href="") Manage Users
-          a(href="") Manage Exams
-          a(href="") Analytics
-          .auth-links
-            .user-info
-              .user-avatar#user-initials
-                if profileImage
-                  img(src=profileImage, alt="Profile Image")
-                else
-                  span#user-initials-text
-              span#user-name #{user.name}
-            a.btn.btn-outline(href="/login.html") Logout
-
-
-    .dashboard-container
-      .dashboard-header
-        h1 #{user.name} Dashboard
-
-      .dashboard-grid
-        .dashboard-card
-          h2.card-title User Management
-          .card-content
-            ul.user-management-list#user-list
+    .dashboard-grid
+      .dashboard-card
+        h2.card-title User Management
+        .card-content
+          ul.user-management-list#user-list
+            each student in students
               li
-                strong Student 1
-                a.btn.btn-small(href="") Edit
+                strong #{student.name} (Student)
+                //- a.btn.btn-small(href="/admin/users/edit/#{student._id}") Edit
+            each teacher in teachers
               li
-                strong Teacher A
-                a.btn.btn-small(href="") Edit
+                strong #{teacher.name} (Teacher)
+                //- a.btn.btn-small(href="/admin/users/edit/#{teacher._id}") Edit
+          p.card-actions
+            a(href="/admin/manage-users") View All Users
+
+      .dashboard-card
+        h2.card-title Exam Management
+        .card-content
+          ul.exam-list
+            each exam in exams
               li
-                strong Student 2
-                a.btn.btn-small(href="") Edit
-            p.card-actions
-              a(href="") View All Users
+                strong #{exam.title}
+                //- a.btn.btn-small(href="/admin/exams/edit/#{exam.examId}") Edit
+          p.card-actions
+            a(href="/admin/manage-exams") View All Exams
 
-        .dashboard-card
-          h2.card-title Exam Management
-          .card-content
-            p Manage and oversee all exams on the platform.
-            p.card-actions
-              a(href="") View All Exams
+      .dashboard-card
+        h2.card-title Exam Analytics
+        .card-content
+          p Total Users: #{totalUsers}
+          p Total Exams Created: #{totalExams}
+          p Total Submissions: #{totalSubmissions}
+          p.card-actions
+            a(href="/admin/analytics") View Detailed Analytics
 
-        .dashboard-card
-          h2.card-title System Analytics
-          .card-content
-            p Overview of platform usage and statistics.
-            p.card-actions
-              a(href="") View Analytics
+      .dashboard-card
+        h2.card-title Quick Actions
+        .card-content
+          p
+            a.btn.btn-primary(href="/admin/create-student") Create New Student User
+          p
+            a.btn.btn-primary(href="/admin/create-teacher") Create New Teacher User
 
-        .dashboard-card
-          h2.card-title Quick Actions
-          .card-content
-            p
-              a.btn.btn-primary(href="") Create New Studet User
-            p
-              a.btn.btn-primary(href="") Create New Teacher User
+block style
+  style.
+    /* Specific styles for the admin dashboard */
+    .dashboard-container {
+      max-width: 1200px;
+      margin: 80px auto;
+      padding: 20px;
+    }
 
-    footer.footer
-      .container
-        .footer-grid
-          .footer-col
-            h3 Pariksha
-            p Empowering educators and students through technology
-          .footer-col
-            h4 Quick Links
-            ul
-              li
-                a(href="/admin/dashboard") Dashboard
-              li
-                a(href="") Manage Users
-              li
-                a(href="") Manage Exams
-          .footer-col
-            h4 Legal
-            ul
-              li
-                a(href="") Privacy Policy
-              li
-                a(href="") Terms of Service
-        .copyright
-          p &copy; 2025 Pariksha. All rights reserved.
+    .dashboard-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
 
-    script.
-      document.getElementById('mobile-menu').addEventListener('click', function() {
-        this.classList.toggle('active');
-        document.getElementById('nav-links').classList.toggle('active');
-      });
+    .dashboard-header h1 {
+      font-size: 2rem;
+      color: var(--dark-color);
+    }
 
-      document.addEventListener('DOMContentLoaded', function() {
-        const userNamePlaceholder = document.getElementById('user-name');
-        const dashboardUserNamePlaceholder = document.getElementById('dashboard-user-name');
-        const userAvatar = document.getElementById('user-initials'); // Get the parent div
-        const dashboardUserAvatar = document.getElementById('dashboard-user-initials'); // Get the parent div
-        const userName = userNamePlaceholder.textContent.trim();
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
 
-        if (userName) {
-          const initials = userName.split(' ').map(n => n[0]).join('').toUpperCase();
-          // For the navigation bar
-          const userInitialsText = userAvatar.querySelector('#user-initials-text');
-          const userImage = userAvatar.querySelector('img');
-          if (userInitialsText) userInitialsText.textContent = initials;
-          if (profileImage) {
-            if (userInitialsText) userInitialsText.style.display = 'none';
-            if (userImage) userImage.style.display = 'block';
-          } else {
-            if (userInitialsText) userInitialsText.style.display = 'flex';
-            if (userImage) userImage.style.display = 'none';
-          }
+    .dashboard-card {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      transition: transform 0.3s ease;
+      border: 1px solid #eee;
+    }
 
-          // For the dashboard header
-          const dashboardUserInitialsText = dashboardUserAvatar.querySelector('#dashboard-user-initials-text');
-          const dashboardUserImage = dashboardUserAvatar.querySelector('img');
-          if (dashboardUserInitialsText) dashboardUserInitialsText.textContent = initials;
-          if (profileImage) {
-            if (dashboardUserInitialsText) dashboardUserInitialsText.style.display = 'none';
-            if (dashboardUserImage) dashboardUserImage.style.display = 'block';
-          } else {
-            if (dashboardUserInitialsText) dashboardUserInitialsText.style.display = 'flex';
-            if (dashboardUserImage) dashboardUserImage.style.display = 'none';
-          }
-        }
-      });
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+      font-size: 1.3rem;
+      color: var(--dark-color);
+      margin-bottom: 10px;
+    }
+
+    .card-content p {
+      color: var(--text-light);
+      margin-bottom: 15px;
+    }
+
+    .card-content ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .card-content ul li {
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .card-content ul li:last-child {
+      border-bottom: none;
+    }
+
+    .card-content ul li strong {
+      color: var(--dark-color);
+    }
+
+    .card-content ul li span {
+      color: var(--text-light);
+      margin-left: 10px;
+      font-size: 0.9rem;
+    }
+
+    .card-actions a {
+      display: inline-block;
+      padding: 8px 15px;
+      border-radius: 5px;
+      text-decoration: none;
+      color: var(--primary-color);
+      border: 1px solid var(--primary-color);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .card-actions a:hover {
+      background-color: var(--primary-color);
+      color: white;
+    }
+
+    .user-management-list li strong {
+      margin-right: 10px;
+    }
