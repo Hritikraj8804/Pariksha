@@ -6,11 +6,18 @@ const pug = require('pug');
 const path = require('path');
 const dev = require('dotenv').config();
 const app = express();
+const morgan = require('morgan');
+const winston = require('winston');
 const fs = require('fs').promises; // Use promises for cleaner async/await
 const fileUpload = require('express-fileupload'); // Middleware for handling file uploads
+const logger = require('./logger.js'); 
+
+morgan.format('simple-dev', ':method :url :status - :response-time ms');
 
 app.use(express.static(path.join(__dirname, '../frontend/public')));
 app.use(express.urlencoded({ extended: true }));
+app.use(morgan('dev'));
+app.use(morgan('combined', { stream: { write: message => logger.info(message.trim()) } }));
 app.use(express.json());
 app.use(fileUpload()); // Enable file upload middleware
 app.set('view engine', 'pug');
@@ -932,20 +939,65 @@ app.get('/teacher/results', async (req, res) => {
 
 app.get('/admin/dashboard', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('admin')) {
-        try {
-            const user = await csemodel.findById(req.session.user._id);
-            if (user && user.profileImage && user.profileImage.data) {
-                const imageData = user.profileImage.data.toString('base64');
-                const imageContentType = user.profileImage.contentType;
-                res.render('admin/adminview', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
-            } else {
-                res.render('admin/adminview', { user: req.session.user, profileImage: null });
-            }
-        } catch (error) {
-            console.error("Error fetching user data for dashboard:", error);
-            res.render('admin/adminview', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
+      try {
+        const user = await csemodel.findById(req.session.user._id).lean();
+        const students = await csemodel.find({ roles: 'student' }).lean();
+        const teachers = await csemodel.find({ roles: 'teacher' }).lean();
+        const exams = await Exam.find().populate('teacherId', 'name').lean(); // Populate teacher's name
+        const totalUsers = await csemodel.countDocuments();
+        const totalExams = await Exam.countDocuments();
+        const totalSubmissions = await StudentScore.countDocuments(); // Assuming StudentScore tracks submissions
+  
+        let profileImage = null;
+        if (user && user.profileImage && user.profileImage.data) {
+          const imageData = user.profileImage.data.toString('base64');
+          const imageContentType = user.profileImage.contentType;
+          profileImage = `data:${imageContentType};base64,${imageData}`;
         }
+  
+        res.render('admin/adminview', {
+          user: req.session.user,
+          profileImage: profileImage,
+          students: students,
+          teachers: teachers,
+          exams: exams,
+          totalUsers: totalUsers,
+          totalExams: totalExams,
+          totalSubmissions: totalSubmissions,
+          errorMessage: null,
+        });
+      } catch (error) {
+        console.error("Error fetching data for admin dashboard:", error);
+        res.render('admin/adminview', {
+          user: req.session.user,
+          profileImage: null,
+          students: [],
+          teachers: [],
+          exams: [],
+          totalUsers: 0,
+          totalExams: 0,
+          totalSubmissions: 0,
+          errorMessage: 'Could not load dashboard information.',
+        });
+      }
     } else {
-        res.redirect('/login.html');
+      res.redirect('/login.html');
     }
-});
+  });
+
+
+  app.get('/admin/logs', async (req, res) => {
+    if (req.session.user && req.session.user.roles.includes('admin')) {
+      const logFilePath = path.join(__dirname, 'logs', 'access.log');
+      try {
+        const logs = await fs.readFile(logFilePath, 'utf8');
+        const logLines = logs.split('\n').reverse();
+        res.render('admin/logs', { user: req.session.user, logs: logLines });
+      } catch (error) {
+        console.error('Error reading log file:', error);
+        res.render('admin/logs', { user: req.session.user, logs: [], error: 'Could not read log file.' });
+      }
+    } else {
+      res.redirect('/login.html');
+    }
+  });
