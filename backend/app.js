@@ -280,6 +280,18 @@ app.post('/student/submit-test', async (req, res) => {
             const totalQuestions = correctQuestions.length;
             let score = 0;
 
+            await Result.findOneAndUpdate(
+                { studentId: studentId },
+                {
+                    $inc: { totalScore: score, totalTests: 1 },
+                    // Recalculate overall percentage (more accurate than just incrementing)
+                    $set: {
+                        overallPercentage: await calculateOverallPercentage(studentId)
+                    }
+                },
+                { upsert: true }
+            );
+
             if (submittedAnswers && totalQuestions > 0) {
                 console.log('submittedAnswers:', submittedAnswers);
                 submittedAnswers.forEach(submittedAnswer => {
@@ -342,11 +354,22 @@ app.post('/student/submit-test', async (req, res) => {
         } catch (error) {
             console.error("Error submitting test and saving/updating score:", error);
             res.status(500).send('Error submitting the test and saving/updating the score.');
+            console.error("Error submitting test and updating total score:", error);
+            res.status(500).send('Error submitting the test and updating the total score.');
         }
     } else {
         res.redirect('/login.html');
     }
 });
+
+async function calculateOverallPercentage(studentId) {
+    const results = await Result.find({ studentId: studentId });
+    if (results.length === 0) {
+        return 0;
+    }
+    const totalPercentageSum = results.reduce((sum, result) => sum + (result.percentage || 0), 0);
+    return parseFloat((totalPercentageSum / results.length).toFixed(2));
+}
 
 app.get('/student/results/:resultId', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {
@@ -386,21 +409,37 @@ app.get('/student/results/:resultId', async (req, res) => {
     }
 });
 
-app.get('/student/leaderboard', async(req, res) => {
+app.get('/student/leaderboard', async (req, res) => {
     if (req.session.user && req.session.user.roles.includes('student')) {
         try {
             const user = await csemodel.findById(req.session.user._id);
+
+            const leaderboardData = await Result.find({})
+                .sort({ overallPercentage: -1 })
+                .populate('studentId', 'name'); // Populate to get the student's name
+
+            let profileImageBase64 = null;
+            let imageContentType = null;
             if (user && user.profileImage && user.profileImage.data) {
-                const imageData = user.profileImage.data.toString('base64');
-                const imageContentType = user.profileImage.contentType;
-                res.render('student/leaderboard', { user: req.session.user, profileImage: `data:${imageContentType};base64,${imageData}` });
-            } else {
-                res.render('student/leaderboard', { user: req.session.user, profileImage: null });
+                profileImageBase64 = user.profileImage.data.toString('base64');
+                imageContentType = user.profileImage.contentType;
             }
+
+            res.render('student/leaderboard', {
+                user: req.session.user,
+                profileImage: profileImageBase64 ? `data:${imageContentType};base64,${profileImageBase64}` : null,
+                leaderboard: leaderboardData
+            });
+
         } catch (error) {
-            console.error("Error fetching user data for dashboard:", error);
-            res.render('student/leaderboard', { user: req.session.user, profileImage: null, errorMessage: 'Could not load profile information.' });
-        } 
+            console.error("Error fetching leaderboard data:", error);
+            res.render('student/leaderboard', {
+                user: req.session.user,
+                profileImage: null,
+                leaderboard: [],
+                errorMessage: 'Could not load leaderboard data.'
+            });
+        }
     } else {
         res.redirect('/login.html');
     }
