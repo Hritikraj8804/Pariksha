@@ -128,23 +128,26 @@ const activitySchema = new mongoose.Schema({
 
 
 const resultSchema = new mongoose.Schema({
-    teacherId: { 
-        type: Number, 
-        ref: 'project', 
-        required: true 
+    studentId: {
+        type: Number,
+        ref: 'project',
+        required: true,
+        unique: true // Each student should have only one total score record
     },
-    examId: { 
-        type: Number, 
-        ref: 'Exam', 
-        required: true 
+    totalScore: {
+        type: Number,
+        default: 0
     },
-    studentId: { 
-        type: Number, 
-        ref: 'project', 
-        required: true 
+    totalTests: {
+        type: Number,
+        default: 0
     },
-    score: Number,
+    overallPercentage: {
+        type: Number,
+        default: 0
+    }
 }, { versionKey: false });
+
 
 const Exam = mongoose.model('Exam', examSchema, 'exams');
 const Question = mongoose.model('Question', questionSchema, 'questions');

@@ -86,14 +86,18 @@ block content
         tr
           th Rank
           th Name
-          th Score
+          th Overall Percentage
+          th Total Score
+          th Tests Taken
       tbody#leaderboard-body
         if leaderboard && leaderboard.length > 0
           each entry, index in leaderboard
             tr
               td #{index + 1}
-              td #{entry.name}
-              td #{entry.score}%
+              td #{entry.studentId.name}
+              td #{entry.overallPercentage}%
+              td #{entry.totalScore}
+              td #{entry.totalTests}
         else
           tr.no-data
-            td(colspan="3") No leaderboard data available.
+            td(colspan="5") No leaderboard data available.
