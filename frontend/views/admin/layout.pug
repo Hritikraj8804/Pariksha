@@ -55,6 +55,11 @@ html(lang="en")
         margin-left: 20px;
       }
 
+      .nav-links a:hover {
+        text-decoration: underline;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
       .nav-links .auth-links {
         display: flex;
         align-items: center;
@@ -211,9 +216,6 @@ html(lang="en")
         .nav-links#nav-links
           if user && user.roles.includes('admin')
             a(href="/admin/dashboard") Dashboard
-            a(href="/admin/manage-users") Manage Users
-            a(href="/admin/manage-exams") Manage Exams
-            a(href="/admin/analytics") Analytics
             a(href="/admin/logs") Logs
           else if user && user.roles.includes('student')
             a(href="/student/dashboard") Dashboard
@@ -247,19 +249,11 @@ html(lang="en")
                 li
                   a(href="/admin/dashboard") Dashboard
                 li
-                  a(href="/admin/manage-users") Manage Users
-                li
-                  a(href="/admin/manage-exams") Manage Exams
-                li
-                  a(href="/admin/analytics") Analytics
+                  a(href="/admin/logs") Logs
               else if user && user.roles.includes('student')
                 li
                   a(href="/student/dashboard") Dashboard
                 // Add other student-specific links here
-              li
-                a(href="/privacy-policy") Privacy Policy
-              li
-                a(href="/terms-of-service") Terms of Service
           .footer-col
             h4 Contact
             p Email: info@pariksha.com

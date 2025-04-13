@@ -87,12 +87,7 @@ block content
     .performance-header
       h1 My Performance, #{user.name}
 
-    .performance-overview
-      h3 Overall Progress
-      if performance && performance.overallCompletionRate !== undefined
-        p Your overall completion rate: #[strong #{performance.overallCompletionRate}%]
-      else
-        p No overall progress data available.
+    
 
     .performance-details
       h3 Subject-wise Performance
