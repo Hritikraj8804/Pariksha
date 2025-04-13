@@ -104,5 +104,16 @@
         <input type="submit" value="Login" class="btn btn-primary">
     </form>
     <a href="./register.html">Register</a>
+    <script>
+        // Check for error messages in URL and show as alert
+        const urlParams = new URLSearchParams(window.location.search);
+        const error = urlParams.get('error');
+        if (error) {
+            alert(error);
+            // Optional: Clear the error from URL after showing
+            window.history.replaceState({}, document.title, window.location.pathname);
+        }
+    </script>
+
 </body>
 </html>

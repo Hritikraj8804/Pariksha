@@ -105,7 +105,7 @@ app.post('/check', async (req, res) => {
     try {
         const user = await csemodel.findOne({ username });
         if (!user) {
-            return res.status(404).json({ error: "User not found" });
+            return res.redirect('/login.html?error=User not found');
         } else {
             const passwordMatch = await bcrypt.compare(password, user.password);
             if (passwordMatch) {
@@ -114,20 +114,18 @@ app.post('/check', async (req, res) => {
                     res.redirect(`/admin/dashboard`);
                 } else if (req.session.user && req.session.user.roles.includes('teacher')) {
                     res.redirect(`/teacher/dashboard`);
-                }  else if (req.session.user && req.session.user.roles.includes('student')) {
+                } else if (req.session.user && req.session.user.roles.includes('student')) {
                     res.redirect(`/student/dashboard`);
+                } else {
+                    res.redirect('/login.html?error=Unauthorized access');
                 }
-                else {
-                    res.redirect('/login.html');
-                }
-
             } else {
-                res.status(401).json({ error: "Invalid credentials" });
+                res.redirect('/login.html?error=Invalid credentials');
             }
         }
     } catch (err) {
         console.error("Login error:", err);
-        res.status(500).json({error:"Internal server error"});
+        res.redirect('/login.html?error=Internal server error');
     }
 });
 
